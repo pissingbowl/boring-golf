@@ -1,0 +1,1732 @@
+Triple phone demo HTML: 
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triple Phone Demo — Premium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1A2F23;
+      --background: #F5F3EF;
+      --surface: #FFFFFF;
+      --accent: #C9A227;
+      --accent-light: #D4B94A;
+      --secondary: #3D5A47;
+      --muted: #6B7280;
+      --live-red: #B8372D;
+      
+      --bg-dark: #0D1512;
+      --bg-card: #1A2F23;
+      --text-primary: #F5F3EF;
+      --text-secondary: #8A9A8F;
+      --text-muted: #5A6A5F;
+      --accent-green: #4CAF50;
+      --negative: #EF4444;
+      
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--background);
+      color: var(--primary);
+      min-height: 100vh;
+      padding: 60px 20px;
+    }
+    
+    .demo-section {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    
+    .phones-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 32px;
+    }
+    
+    .phone-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .phone-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-bottom: 14px;
+      opacity: 0.6;
+    }
+    
+    .phone-frame {
+      position: relative;
+      width: 240px;
+      background: linear-gradient(
+        160deg,
+        #4A4A4C 0%,
+        #2C2C2E 15%,
+        #1C1C1E 50%,
+        #0D0D0F 85%,
+        #1C1C1E 100%
+      );
+      border-radius: 40px;
+      padding: 9px;
+      box-shadow: 
+        0 50px 100px rgba(0, 0, 0, 0.3),
+        0 25px 50px rgba(0, 0, 0, 0.2),
+        0 0 0 0.5px rgba(255, 255, 255, 0.1),
+        inset 0 0 0 0.5px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 25px;
+      right: 25px;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.25) 30%,
+        rgba(255,255,255,0.35) 50%,
+        rgba(255,255,255,0.25) 70%,
+        transparent 100%
+      );
+    }
+    
+    .phone-frame::after {
+      content: '';
+      position: absolute;
+      right: -2px;
+      top: 90px;
+      width: 3px;
+      height: 55px;
+      background: linear-gradient(180deg, #3A3A3C 0%, #1C1C1E 100%);
+      border-radius: 0 2px 2px 0;
+    }
+    
+    .phone-btn-left {
+      position: absolute;
+      left: -2px;
+      width: 3px;
+      background: linear-gradient(180deg, #3A3A3C 0%, #1C1C1E 100%);
+      border-radius: 2px 0 0 2px;
+    }
+    
+    .phone-btn-left.silent { top: 75px; height: 22px; }
+    .phone-btn-left.vol1 { top: 110px; height: 32px; }
+    .phone-btn-left.vol2 { top: 150px; height: 32px; }
+    
+    .phone-screen {
+      background: var(--background);
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      height: 500px;
+      box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .phone-screen.dark {
+      background: var(--bg-dark);
+    }
+    
+    .dynamic-island {
+      position: absolute;
+      top: 9px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 76px;
+      height: 22px;
+      background: #000;
+      border-radius: 14px;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    
+    .dynamic-island::before {
+      content: '';
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 5px;
+      background: radial-gradient(circle, #1a1a2e 0%, #0a0a12 100%);
+      border-radius: 50%;
+    }
+    
+    .dynamic-island::after {
+      content: '';
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 7px;
+      height: 7px;
+      background: radial-gradient(circle, #0d2818 0%, #051a0a 100%);
+      border-radius: 50%;
+    }
+    
+    .screen-content {
+      padding-top: 38px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* ==========================================
+       LIVE FEED (Phone 1)
+       ========================================== */
+    .live-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid rgba(26, 47, 35, 0.08);
+    }
+    
+    .live-header-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    
+    .live-dot-wrap {
+      position: relative;
+      width: 7px;
+      height: 7px;
+    }
+    
+    .live-dot {
+      position: absolute;
+      inset: 0;
+      background: var(--live-red);
+      border-radius: 50%;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    
+    .live-ring {
+      position: absolute;
+      inset: -3px;
+      border: 1.5px solid var(--live-red);
+      border-radius: 50%;
+      opacity: 0;
+      animation: ring 2.5s ease-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.9; }
+    }
+    
+    @keyframes ring {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    
+    .live-text {
+      font-size: 0.5625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--live-red);
+    }
+    
+    .header-time {
+      font-size: 0.5625rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    
+    .trip-bar {
+      background: linear-gradient(135deg, var(--primary) 0%, #223D2C 100%);
+      color: white;
+      padding: 9px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    
+    .trip-bar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 50 Q100 30 200 50 T400 50' fill='none' stroke='white' stroke-width='0.5' opacity='0.05'/%3E%3Cpath d='M0 35 Q100 15 200 35 T400 35' fill='none' stroke='white' stroke-width='0.5' opacity='0.03'/%3E%3C/svg%3E");
+      background-size: cover;
+    }
+    
+    .trip-name {
+      font-size: 0.625rem;
+      font-weight: 600;
+      position: relative;
+    }
+    
+    .trip-status {
+      font-size: 0.4375rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.6;
+      position: relative;
+    }
+    
+    .cards-container {
+      flex: 1;
+      padding: 14px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: linear-gradient(180deg, var(--background) 0%, #EDEAE4 100%);
+    }
+    
+    .live-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 18px 14px;
+      width: calc(100% - 28px);
+      text-align: center;
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      box-shadow: 
+        0 6px 24px rgba(26, 47, 35, 0.07),
+        0 2px 6px rgba(26, 47, 35, 0.04),
+        0 0 0 0.5px rgba(26, 47, 35, 0.04);
+      opacity: 0;
+      transform: translateY(18px) scale(0.97);
+      transition: all 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    .live-card.active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    
+    .live-card.exiting {
+      opacity: 0;
+      transform: translateY(-18px) scale(0.97);
+    }
+    
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.4375rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      padding: 3px 7px;
+      background: rgba(26, 47, 35, 0.04);
+      border-radius: 100px;
+    }
+    
+    .card-badge svg {
+      width: 8px;
+      height: 8px;
+      opacity: 0.5;
+    }
+    
+    .card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+    
+    .card-value {
+      font-family: var(--font-serif);
+      font-size: 1.375rem;
+      font-weight: 500;
+      line-height: 1.1;
+      margin-bottom: 3px;
+      color: var(--primary);
+    }
+    
+    .card-value.gold {
+      background: linear-gradient(135deg, var(--accent) 0%, #D9B84A 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .card-value.sm {
+      font-size: 1rem;
+    }
+    
+    .card-sub {
+      font-size: 0.6875rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    
+    .card-quote {
+      font-family: var(--font-serif);
+      font-size: 0.75rem;
+      font-style: italic;
+      line-height: 1.45;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+    
+    .card-tip {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+    
+    .card-detail {
+      font-size: 0.625rem;
+      color: var(--muted);
+    }
+    
+    .card-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.5rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 100px;
+      margin-top: 8px;
+    }
+    
+    .card-status svg { width: 8px; height: 8px; }
+    .card-status.confirmed { background: rgba(39, 174, 96, 0.1); color: #22A55B; }
+    .card-status.info { background: rgba(59, 130, 246, 0.1); color: #2563EB; }
+    .card-status.warning { background: rgba(245, 158, 11, 0.1); color: #D97706; }
+    
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      padding: 10px 0;
+      background: linear-gradient(180deg, #EDEAE4 0%, var(--background) 100%);
+    }
+    
+    .dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(26, 47, 35, 0.15);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    
+    .dot.active {
+      width: 16px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+    
+    .home-indicator {
+      width: 90px;
+      height: 4px;
+      background: rgba(26, 47, 35, 0.18);
+      border-radius: 2px;
+      margin: 5px auto 8px;
+    }
+    
+    .dark .home-indicator {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    
+    /* ==========================================
+       LEADERBOARD (Phone 2)
+       ========================================== */
+    .lb-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 12px;
+      background: var(--bg-card);
+      border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .lb-header-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    
+    .lb-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .lb-badge {
+      font-size: 0.375rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 100px;
+      color: var(--text-secondary);
+    }
+    
+    .lb-live {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.4375rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #E53935;
+    }
+    
+    .lb-live .live-dot { width: 5px; height: 5px; background: #E53935; }
+    
+    .lb-progress {
+      padding: 7px 12px;
+      background: rgba(0,0,0,0.3);
+    }
+    
+    .lb-progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.4375rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    
+    .lb-progress-bar {
+      height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .lb-progress-fill {
+      height: 100%;
+      width: 66%;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+      border-radius: 2px;
+    }
+    
+    .lb-table {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+    }
+    
+    .lb-table-head {
+      display: grid;
+      grid-template-columns: 24px 1fr 36px 44px;
+      padding: 5px 10px;
+      background: rgba(0,0,0,0.2);
+      border-bottom: 0.5px solid rgba(255,255,255,0.04);
+      font-size: 0.375rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+    
+    .lb-table-body { flex: 1; overflow: hidden; }
+    
+    .lb-row {
+      display: grid;
+      grid-template-columns: 24px 1fr 36px 44px;
+      padding: 7px 10px;
+      align-items: center;
+      border-bottom: 0.5px solid rgba(255,255,255,0.03);
+    }
+    
+    .lb-row.leader { background: rgba(201, 162, 39, 0.12); }
+    
+    .lb-pos {
+      font-family: var(--font-mono);
+      font-size: 0.5625rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    .lb-row.leader .lb-pos { color: var(--accent); }
+    
+    .lb-player {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .lb-avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.375rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    .lb-row.leader .lb-avatar {
+      background: rgba(201, 162, 39, 0.2);
+      color: var(--accent);
+    }
+    
+    .lb-name {
+      font-size: 0.5625rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .lb-score {
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    
+    .lb-score.under { color: var(--accent-green); }
+    .lb-score.over { color: #EF4444; }
+    .lb-score.even { color: var(--text-secondary); }
+    
+    .lb-skins { text-align: right; }
+    
+    .lb-skins-count {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .lb-row.leader .lb-skins-count { color: var(--accent); }
+    
+    .lb-skins-money {
+      font-size: 0.375rem;
+      color: var(--accent-green);
+      font-weight: 500;
+    }
+    
+    .lb-footer {
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 10px;
+      background: rgba(0,0,0,0.3);
+      border-top: 0.5px solid rgba(255,255,255,0.04);
+    }
+    
+    .lb-stat { text-align: center; }
+    
+    .lb-stat-val {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1px;
+    }
+    
+    .lb-stat-val.gold { color: var(--accent); }
+    
+    .lb-stat-label {
+      font-size: 0.3125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+    
+    .lb-banner {
+      position: absolute;
+      bottom: 45px;
+      left: 9px;
+      right: 9px;
+      background: linear-gradient(135deg, #1A2F23 0%, #0D1512 100%);
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      border-radius: 9px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      opacity: 0;
+      transform: translateY(14px);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10;
+    }
+    
+    .lb-banner.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .lb-banner-icon { font-size: 1.125rem; }
+    .lb-banner-content { flex: 1; }
+    
+    .lb-banner-title {
+      font-size: 0.375rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 1px;
+    }
+    
+    .lb-banner-msg {
+      font-size: 0.5625rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    /* ==========================================
+       LEDGER (Phone 3) — ANIMATED PAGES
+       ========================================== */
+    .ledger-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 12px;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid rgba(26, 47, 35, 0.08);
+    }
+    
+    .ledger-header-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    
+    .ledger-icon {
+      width: 18px;
+      height: 18px;
+      background: var(--primary);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .ledger-icon svg {
+      width: 10px;
+      height: 10px;
+      color: white;
+    }
+    
+    .ledger-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .ledger-badge {
+      font-size: 0.375rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      background: rgba(76, 175, 80, 0.1);
+      border-radius: 100px;
+      color: var(--accent-green);
+    }
+    
+    .ledger-summary {
+      background: linear-gradient(135deg, var(--primary) 0%, #223D2C 100%);
+      color: white;
+      padding: 14px 12px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .ledger-summary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 50 Q100 30 200 50 T400 50' fill='none' stroke='white' stroke-width='0.5' opacity='0.05'/%3E%3C/svg%3E");
+      background-size: cover;
+    }
+    
+    .ledger-total-label {
+      font-size: 0.4375rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.6;
+      margin-bottom: 4px;
+      position: relative;
+    }
+    
+    .ledger-total {
+      font-family: var(--font-mono);
+      font-size: 1.75rem;
+      font-weight: 700;
+      position: relative;
+    }
+    
+    .ledger-total-sub {
+      font-size: 0.5rem;
+      opacity: 0.7;
+      margin-top: 4px;
+      position: relative;
+    }
+    
+    .ledger-tabs {
+      display: flex;
+      background: var(--surface);
+      border-bottom: 1px solid rgba(26, 47, 35, 0.08);
+    }
+    
+    .ledger-tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.5rem;
+      font-weight: 600;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .ledger-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--accent);
+    }
+    
+    /* Ledger pages container */
+    .ledger-pages {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: var(--background);
+    }
+    
+    .ledger-page {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .ledger-page.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .ledger-page.exiting {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    
+    /* Page 1: Balances */
+    .ledger-list {
+      flex: 1;
+      overflow: hidden;
+    }
+    
+    .ledger-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      background: var(--surface);
+      border-bottom: 1px solid rgba(26, 47, 35, 0.05);
+    }
+    
+    .ledger-row-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(26, 47, 35, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.5rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-right: 10px;
+    }
+    
+    .ledger-row-info { flex: 1; }
+    
+    .ledger-row-name {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    
+    .ledger-row-detail {
+      font-size: 0.4375rem;
+      color: var(--muted);
+    }
+    
+    .ledger-row-amount {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 700;
+    }
+    
+    .ledger-row-amount.owes { color: var(--negative); }
+    .ledger-row-amount.owed { color: var(--accent-green); }
+    .ledger-row-amount.settled { color: var(--muted); }
+    
+    .ledger-row-status {
+      font-size: 0.375rem;
+      text-align: right;
+      margin-top: 2px;
+    }
+    
+    /* Page 2: Activity */
+    .activity-row {
+      display: flex;
+      align-items: flex-start;
+      padding: 10px 12px;
+      background: var(--surface);
+      border-bottom: 1px solid rgba(26, 47, 35, 0.05);
+      gap: 10px;
+    }
+    
+    .activity-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
+    
+    .activity-icon.food { background: rgba(245, 158, 11, 0.1); }
+    .activity-icon.golf { background: rgba(76, 175, 80, 0.1); }
+    .activity-icon.lodging { background: rgba(59, 130, 246, 0.1); }
+    .activity-icon.transport { background: rgba(139, 92, 246, 0.1); }
+    
+    .activity-info { flex: 1; }
+    
+    .activity-title {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    
+    .activity-meta {
+      font-size: 0.4375rem;
+      color: var(--muted);
+    }
+    
+    .activity-amount {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .activity-split {
+      font-size: 0.375rem;
+      color: var(--muted);
+      text-align: right;
+    }
+    
+    /* Page 3: Settle */
+    .settle-card {
+      margin: 12px;
+      padding: 14px;
+      background: var(--surface);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(26, 47, 35, 0.06);
+    }
+    
+    .settle-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    
+    .settle-avatars {
+      display: flex;
+    }
+    
+    .settle-avatars .ledger-row-avatar {
+      margin-right: -8px;
+      border: 2px solid var(--surface);
+    }
+    
+    .settle-avatars .ledger-row-avatar:last-child {
+      margin-right: 0;
+    }
+    
+    .settle-info { flex: 1; }
+    
+    .settle-title {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .settle-desc {
+      font-size: 0.4375rem;
+      color: var(--muted);
+    }
+    
+    .settle-amount {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+    
+    .settle-methods {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .settle-method {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 0.5rem;
+      font-weight: 600;
+      border: 1px solid rgba(26, 47, 35, 0.1);
+      color: var(--muted);
+    }
+    
+    .settle-method.primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    /* Bottom action bar */
+    .ledger-action {
+      margin: 10px 12px 0;
+      padding: 10px;
+      background: var(--primary);
+      border-radius: 8px;
+      text-align: center;
+      color: white;
+      font-size: 0.5625rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .ledger-action svg {
+      width: 12px;
+      height: 12px;
+    }
+    
+    /* ==========================================
+       TAGLINE
+       ========================================== */
+    .tagline {
+      text-align: center;
+      margin-top: 56px;
+    }
+    
+    .tagline-text {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--primary);
+      opacity: 0.8;
+    }
+    
+    /* ==========================================
+       RESPONSIVE
+       ========================================== */
+    @media (max-width: 800px) {
+      .phones-container {
+        flex-wrap: wrap;
+        gap: 24px;
+      }
+      
+      .phone-frame {
+        width: 220px;
+      }
+      
+      .phone-screen {
+        height: 460px;
+      }
+    }
+    
+    @media (max-width: 500px) {
+      .phones-container {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-section">
+    <div class="phones-container">
+      
+      <!-- PHONE 1: LIVE FEED -->
+      <div class="phone-wrapper" id="livePhone">
+        <span class="phone-label">Live Feed</span>
+        <div class="phone-frame">
+          <div class="phone-btn-left silent"></div>
+          <div class="phone-btn-left vol1"></div>
+          <div class="phone-btn-left vol2"></div>
+          
+          <div class="phone-screen">
+            <div class="dynamic-island"></div>
+            
+            <div class="screen-content">
+              <div class="live-header">
+                <div class="live-header-left">
+                  <div class="live-dot-wrap">
+                    <span class="live-dot"></span>
+                    <span class="live-ring"></span>
+                  </div>
+                  <span class="live-text">Live</span>
+                </div>
+                <span class="header-time" id="time1">2:47 PM</span>
+              </div>
+              
+              <div class="trip-bar">
+                <span class="trip-name">Pinehurst Invitational</span>
+                <span class="trip-status">Day 2 of 4</span>
+              </div>
+              
+              <div class="cards-container">
+                <div class="live-card active" data-card="1">
+                  <div class="card-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Coming Up
+                  </div>
+                  <div class="card-value gold">1h 23m</div>
+                  <div class="card-sub">until tee time</div>
+                  <div class="card-tip">Pinehurst No. 2 • 4:10 PM</div>
+                  <div class="card-status confirmed">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Confirmed
+                  </div>
+                </div>
+                
+                <div class="live-card" data-card="2">
+                  <div class="card-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                    Weather
+                  </div>
+                  <div class="card-icon">⛅</div>
+                  <div class="card-value">64°F</div>
+                  <div class="card-sub">Partly Cloudy</div>
+                  <div class="card-detail">Wind 12mph SW</div>
+                </div>
+                
+                <div class="live-card" data-card="3">
+                  <div class="card-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                    On Course
+                  </div>
+                  <div class="card-value sm">Hole 7</div>
+                  <div class="card-sub">Par 4 • 438 yards</div>
+                  <div class="card-quote">"Favor the left. Right bunker is a round-killer."</div>
+                  <div class="card-tip">Handicap 3</div>
+                </div>
+                
+                <div class="live-card" data-card="4">
+                  <div class="card-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                    Crew Update
+                  </div>
+                  <div class="card-icon">✈️</div>
+                  <div class="card-value sm">Jake Landed</div>
+                  <div class="card-sub">RDU Airport • Just now</div>
+                  <div class="card-status info">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    En Route
+                  </div>
+                </div>
+                
+                <div class="live-card" data-card="5">
+                  <div class="card-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                    Tonight
+                  </div>
+                  <div class="card-icon">🍽️</div>
+                  <div class="card-value sm">The Deuce</div>
+                  <div class="card-sub">7:30 PM • Party of 8</div>
+                  <div class="card-status confirmed">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Reserved
+                  </div>
+                </div>
+                
+                <div class="live-card" data-card="6">
+                  <div class="card-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                    Day 1 Skins
+                  </div>
+                  <div class="card-icon">🏆</div>
+                  <div class="card-value sm">Marcus Leads</div>
+                  <div class="card-sub">3 skins • $60</div>
+                  <div class="card-status warning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    In Progress
+                  </div>
+                </div>
+              </div>
+              
+              <div class="dots">
+                <span class="dot active" data-i="1"></span>
+                <span class="dot" data-i="2"></span>
+                <span class="dot" data-i="3"></span>
+                <span class="dot" data-i="4"></span>
+                <span class="dot" data-i="5"></span>
+                <span class="dot" data-i="6"></span>
+              </div>
+              
+              <div class="home-indicator"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- PHONE 2: LEADERBOARD -->
+      <div class="phone-wrapper" id="lbPhone">
+        <span class="phone-label">Leaderboard</span>
+        <div class="phone-frame">
+          <div class="phone-btn-left silent"></div>
+          <div class="phone-btn-left vol1"></div>
+          <div class="phone-btn-left vol2"></div>
+          
+          <div class="phone-screen dark">
+            <div class="dynamic-island"></div>
+            
+            <div class="screen-content">
+              <div class="lb-header">
+                <div class="lb-header-left">
+                  <span class="lb-title">Day 1 Skins</span>
+                  <span class="lb-badge">$20/hole</span>
+                </div>
+                <div class="lb-live">
+                  <span class="live-dot"></span>
+                  Live
+                </div>
+              </div>
+              
+              <div class="lb-progress">
+                <div class="lb-progress-top">
+                  <span>Hole 12 of 18</span>
+                  <span>7 skins won</span>
+                </div>
+                <div class="lb-progress-bar">
+                  <div class="lb-progress-fill"></div>
+                </div>
+              </div>
+              
+              <div class="lb-table">
+                <div class="lb-table-head">
+                  <span>#</span>
+                  <span>Player</span>
+                  <span style="text-align:center">Today</span>
+                  <span style="text-align:right">Skins</span>
+                </div>
+                <div class="lb-table-body">
+                  <div class="lb-row leader">
+                    <span class="lb-pos">1</span>
+                    <div class="lb-player">
+                      <div class="lb-avatar">MC</div>
+                      <span class="lb-name">Marcus Chen</span>
+                    </div>
+                    <span class="lb-score under">-2</span>
+                    <div class="lb-skins">
+                      <div class="lb-skins-count">4</div>
+                      <div class="lb-skins-money">$80</div>
+                    </div>
+                  </div>
+                  
+                  <div class="lb-row">
+                    <span class="lb-pos">2</span>
+                    <div class="lb-player">
+                      <div class="lb-avatar">JM</div>
+                      <span class="lb-name">Jake Morrison</span>
+                    </div>
+                    <span class="lb-score under">-1</span>
+                    <div class="lb-skins">
+                      <div class="lb-skins-count">2</div>
+                      <div class="lb-skins-money">$40</div>
+                    </div>
+                  </div>
+                  
+                  <div class="lb-row">
+                    <span class="lb-pos">3</span>
+                    <div class="lb-player">
+                      <div class="lb-avatar">DW</div>
+                      <span class="lb-name">Devon Williams</span>
+                    </div>
+                    <span class="lb-score even">E</span>
+                    <div class="lb-skins">
+                      <div class="lb-skins-count">1</div>
+                      <div class="lb-skins-money">$20</div>
+                    </div>
+                  </div>
+                  
+                  <div class="lb-row">
+                    <span class="lb-pos">-</span>
+                    <div class="lb-player">
+                      <div class="lb-avatar">RO</div>
+                      <span class="lb-name">Ryan O'Connor</span>
+                    </div>
+                    <span class="lb-score over">+3</span>
+                    <div class="lb-skins">
+                      <div class="lb-skins-count">0</div>
+                    </div>
+                  </div>
+                  
+                  <div class="lb-row">
+                    <span class="lb-pos">-</span>
+                    <div class="lb-player">
+                      <div class="lb-avatar">TN</div>
+                      <span class="lb-name">Tommy Nguyen</span>
+                    </div>
+                    <span class="lb-score over">+5</span>
+                    <div class="lb-skins">
+                      <div class="lb-skins-count">0</div>
+                    </div>
+                  </div>
+                  
+                  <div class="lb-row">
+                    <span class="lb-pos">-</span>
+                    <div class="lb-player">
+                      <div class="lb-avatar">AH</div>
+                      <span class="lb-name">Alex Hartman</span>
+                    </div>
+                    <span class="lb-score over">+2</span>
+                    <div class="lb-skins">
+                      <div class="lb-skins-count">0</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="lb-footer">
+                <div class="lb-stat">
+                  <div class="lb-stat-val gold">$40</div>
+                  <div class="lb-stat-label">Carryover</div>
+                </div>
+                <div class="lb-stat">
+                  <div class="lb-stat-val">7</div>
+                  <div class="lb-stat-label">Skins Won</div>
+                </div>
+                <div class="lb-stat">
+                  <div class="lb-stat-val">$100</div>
+                  <div class="lb-stat-label">Pot Left</div>
+                </div>
+              </div>
+              
+              <div class="lb-banner" id="lbBanner">
+                <span class="lb-banner-icon">🔥</span>
+                <div class="lb-banner-content">
+                  <div class="lb-banner-title">Skin Won — Hole 12</div>
+                  <div class="lb-banner-msg">Marcus wins $40</div>
+                </div>
+              </div>
+              
+              <div class="home-indicator"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- PHONE 3: LEDGER (ANIMATED PAGES) -->
+      <div class="phone-wrapper" id="ledgerPhone">
+        <span class="phone-label">Ledger</span>
+        <div class="phone-frame">
+          <div class="phone-btn-left silent"></div>
+          <div class="phone-btn-left vol1"></div>
+          <div class="phone-btn-left vol2"></div>
+          
+          <div class="phone-screen">
+            <div class="dynamic-island"></div>
+            
+            <div class="screen-content">
+              <div class="ledger-header">
+                <div class="ledger-header-left">
+                  <div class="ledger-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                      <line x1="2" y1="7" x2="22" y2="7"/>
+                    </svg>
+                  </div>
+                  <span class="ledger-title">Trip Ledger</span>
+                </div>
+                <span class="ledger-badge" id="ledgerBadge">3 unsettled</span>
+              </div>
+              
+              <div class="ledger-summary">
+                <div class="ledger-total-label">Total Trip Expenses</div>
+                <div class="ledger-total">$4,847</div>
+                <div class="ledger-total-sub">Across 8 people • 23 transactions</div>
+              </div>
+              
+              <div class="ledger-tabs">
+                <div class="ledger-tab active" data-tab="0">Balances</div>
+                <div class="ledger-tab" data-tab="1">Activity</div>
+                <div class="ledger-tab" data-tab="2">Settle</div>
+              </div>
+              
+              <div class="ledger-pages">
+                
+                <!-- Page 1: Balances -->
+                <div class="ledger-page active" data-page="0">
+                  <div class="ledger-list">
+                    <div class="ledger-row">
+                      <div class="ledger-row-avatar">MC</div>
+                      <div class="ledger-row-info">
+                        <div class="ledger-row-name">Marcus Chen</div>
+                        <div class="ledger-row-detail">Paid for dinner, golf cart</div>
+                      </div>
+                      <div>
+                        <div class="ledger-row-amount owed">+$142</div>
+                        <div class="ledger-row-status">is owed</div>
+                      </div>
+                    </div>
+                    
+                    <div class="ledger-row">
+                      <div class="ledger-row-avatar">JM</div>
+                      <div class="ledger-row-info">
+                        <div class="ledger-row-name">Jake Morrison</div>
+                        <div class="ledger-row-detail">Paid for lodging deposit</div>
+                      </div>
+                      <div>
+                        <div class="ledger-row-amount owed">+$89</div>
+                        <div class="ledger-row-status">is owed</div>
+                      </div>
+                    </div>
+                    
+                    <div class="ledger-row">
+                      <div class="ledger-row-avatar">DW</div>
+                      <div class="ledger-row-info">
+                        <div class="ledger-row-name">Devon Williams</div>
+                        <div class="ledger-row-detail">All settled up</div>
+                      </div>
+                      <div>
+                        <div class="ledger-row-amount settled">$0</div>
+                        <div class="ledger-row-status">settled</div>
+                      </div>
+                    </div>
+                    
+                    <div class="ledger-row">
+                      <div class="ledger-row-avatar">RO</div>
+                      <div class="ledger-row-info">
+                        <div class="ledger-row-name">Ryan O'Connor</div>
+                        <div class="ledger-row-detail">Owes for dinner, drinks</div>
+                      </div>
+                      <div>
+                        <div class="ledger-row-amount owes">-$67</div>
+                        <div class="ledger-row-status">owes</div>
+                      </div>
+                    </div>
+                    
+                    <div class="ledger-row">
+                      <div class="ledger-row-avatar">TN</div>
+                      <div class="ledger-row-info">
+                        <div class="ledger-row-name">Tommy Nguyen</div>
+                        <div class="ledger-row-detail">Owes for range balls</div>
+                      </div>
+                      <div>
+                        <div class="ledger-row-amount owes">-$34</div>
+                        <div class="ledger-row-status">owes</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Page 2: Activity -->
+                <div class="ledger-page" data-page="1">
+                  <div class="ledger-list">
+                    <div class="activity-row">
+                      <div class="activity-icon food">🍽️</div>
+                      <div class="activity-info">
+                        <div class="activity-title">Dinner at The Deuce</div>
+                        <div class="activity-meta">Marcus paid • Yesterday</div>
+                      </div>
+                      <div>
+                        <div class="activity-amount">$847</div>
+                        <div class="activity-split">÷ 8 people</div>
+                      </div>
+                    </div>
+                    
+                    <div class="activity-row">
+                      <div class="activity-icon golf">⛳</div>
+                      <div class="activity-info">
+                        <div class="activity-title">Golf Cart Rental</div>
+                        <div class="activity-meta">Marcus paid • Yesterday</div>
+                      </div>
+                      <div>
+                        <div class="activity-amount">$320</div>
+                        <div class="activity-split">÷ 4 carts</div>
+                      </div>
+                    </div>
+                    
+                    <div class="activity-row">
+                      <div class="activity-icon lodging">🏨</div>
+                      <div class="activity-info">
+                        <div class="activity-title">Lodging Deposit</div>
+                        <div class="activity-meta">Jake paid • Dec 15</div>
+                      </div>
+                      <div>
+                        <div class="activity-amount">$2,400</div>
+                        <div class="activity-split">÷ 8 people</div>
+                      </div>
+                    </div>
+                    
+                    <div class="activity-row">
+                      <div class="activity-icon food">🍺</div>
+                      <div class="activity-info">
+                        <div class="activity-title">Bar Tab — Day 1</div>
+                        <div class="activity-meta">Devon paid • Yesterday</div>
+                      </div>
+                      <div>
+                        <div class="activity-amount">$286</div>
+                        <div class="activity-split">÷ 8 people</div>
+                      </div>
+                    </div>
+                    
+                    <div class="activity-row">
+                      <div class="activity-icon transport">🚐</div>
+                      <div class="activity-info">
+                        <div class="activity-title">Airport Shuttle</div>
+                        <div class="activity-meta">Jake paid • Dec 27</div>
+                      </div>
+                      <div>
+                        <div class="activity-amount">$180</div>
+                        <div class="activity-split">÷ 6 people</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Page 3: Settle -->
+                <div class="ledger-page" data-page="2">
+                  <div class="settle-card">
+                    <div class="settle-header">
+                      <div class="settle-avatars">
+                        <div class="ledger-row-avatar">RO</div>
+                        <div class="ledger-row-avatar">→</div>
+                        <div class="ledger-row-avatar">MC</div>
+                      </div>
+                      <div class="settle-info">
+                        <div class="settle-title">Ryan → Marcus</div>
+                        <div class="settle-desc">For dinner, golf cart</div>
+                      </div>
+                      <div class="settle-amount">$67</div>
+                    </div>
+                    <div class="settle-methods">
+                      <div class="settle-method">Venmo</div>
+                      <div class="settle-method primary">Mark Paid</div>
+                    </div>
+                  </div>
+                  
+                  <div class="settle-card">
+                    <div class="settle-header">
+                      <div class="settle-avatars">
+                        <div class="ledger-row-avatar">TN</div>
+                        <div class="ledger-row-avatar">→</div>
+                        <div class="ledger-row-avatar">JM</div>
+                      </div>
+                      <div class="settle-info">
+                        <div class="settle-title">Tommy → Jake</div>
+                        <div class="settle-desc">For lodging deposit</div>
+                      </div>
+                      <div class="settle-amount">$34</div>
+                    </div>
+                    <div class="settle-methods">
+                      <div class="settle-method">Venmo</div>
+                      <div class="settle-method primary">Mark Paid</div>
+                    </div>
+                  </div>
+                  
+                  <div class="settle-card">
+                    <div class="settle-header">
+                      <div class="settle-avatars">
+                        <div class="ledger-row-avatar">AH</div>
+                        <div class="ledger-row-avatar">→</div>
+                        <div class="ledger-row-avatar">MC</div>
+                      </div>
+                      <div class="settle-info">
+                        <div class="settle-title">Alex → Marcus</div>
+                        <div class="settle-desc">For drinks, range</div>
+                      </div>
+                      <div class="settle-amount">$52</div>
+                    </div>
+                    <div class="settle-methods">
+                      <div class="settle-method">Venmo</div>
+                      <div class="settle-method primary">Mark Paid</div>
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+              
+              <div class="ledger-action" id="ledgerAction">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <span id="ledgerActionText">Send Trip Receipt</span>
+              </div>
+              
+              <div class="home-indicator"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- TAGLINE -->
+    <div class="tagline">
+      <p class="tagline-text">...and a few other tools we've gone too long without.</p>
+    </div>
+    
+  </div>
+
+  <script>
+    // LIVE FEED ROTATION
+    const cards = document.querySelectorAll('.live-card');
+    const dots = document.querySelectorAll('.dot');
+    let liveIdx = 0;
+    let livePaused = false;
+    
+    function showLiveCard(i) {
+      cards.forEach((c, j) => {
+        c.classList.remove('active', 'exiting');
+        if (j === liveIdx && j !== i) c.classList.add('exiting');
+      });
+      dots.forEach(d => d.classList.remove('active'));
+      
+      setTimeout(() => {
+        cards.forEach(c => c.classList.remove('exiting'));
+        cards[i].classList.add('active');
+        dots[i].classList.add('active');
+      }, 300);
+      
+      liveIdx = i;
+    }
+    
+    setInterval(() => {
+      if (!livePaused) showLiveCard((liveIdx + 1) % cards.length);
+    }, 4500);
+    
+    dots.forEach((d, i) => d.addEventListener('click', () => showLiveCard(i)));
+    
+    document.getElementById('livePhone').addEventListener('mouseenter', () => livePaused = true);
+    document.getElementById('livePhone').addEventListener('mouseleave', () => livePaused = false);
+    
+    // LEADERBOARD BANNER
+    const banner = document.getElementById('lbBanner');
+    const banners = [
+      { icon: '🔥', title: 'Skin Won — Hole 12', msg: 'Marcus wins $40' },
+      { icon: '🐦', title: 'Birdie!', msg: 'Jake birdies #11' },
+      { icon: '💰', title: 'Carryover', msg: '$60 carries to #11' },
+      { icon: '🏆', title: 'New Leader', msg: 'Marcus takes lead' },
+    ];
+    let bannerIdx = 0;
+    
+    function showBanner() {
+      const b = banners[bannerIdx];
+      banner.querySelector('.lb-banner-icon').textContent = b.icon;
+      banner.querySelector('.lb-banner-title').textContent = b.title;
+      banner.querySelector('.lb-banner-msg').textContent = b.msg;
+      banner.classList.add('visible');
+      setTimeout(() => banner.classList.remove('visible'), 3500);
+      bannerIdx = (bannerIdx + 1) % banners.length;
+    }
+    
+    setTimeout(() => {
+      showBanner();
+      setInterval(showBanner, 6000);
+    }, 2500);
+    
+    // LEDGER PAGE ROTATION
+    const ledgerPages = document.querySelectorAll('.ledger-page');
+    const ledgerTabs = document.querySelectorAll('.ledger-tab');
+    const ledgerBadge = document.getElementById('ledgerBadge');
+    const ledgerActionText = document.getElementById('ledgerActionText');
+    let ledgerIdx = 0;
+    let ledgerPaused = false;
+    
+    const ledgerData = [
+      { badge: '3 unsettled', action: 'Send Trip Receipt', icon: 'email' },
+      { badge: '23 transactions', action: 'Upload Receipt', icon: 'camera' },
+      { badge: '$153 pending', action: 'Export Summary', icon: 'download' },
+    ];
+    
+    const actionIcons = {
+      email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+      camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+      download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+    };
+    
+    const ledgerAction = document.getElementById('ledgerAction');
+    
+    function showLedgerPage(i) {
+      ledgerPages.forEach((p, j) => {
+        p.classList.remove('active', 'exiting');
+        if (j === ledgerIdx && j !== i) p.classList.add('exiting');
+      });
+      ledgerTabs.forEach(t => t.classList.remove('active'));
+      
+      setTimeout(() => {
+        ledgerPages.forEach(p => p.classList.remove('exiting'));
+        ledgerPages[i].classList.add('active');
+        ledgerTabs[i].classList.add('active');
+        ledgerBadge.textContent = ledgerData[i].badge;
+        ledgerActionText.textContent = ledgerData[i].action;
+        ledgerAction.querySelector('svg').outerHTML = actionIcons[ledgerData[i].icon];
+      }, 300);
+      
+      ledgerIdx = i;
+    }
+    
+    setInterval(() => {
+      if (!ledgerPaused) showLedgerPage((ledgerIdx + 1) % ledgerPages.length);
+    }, 5000);
+    
+    ledgerTabs.forEach((t, i) => t.addEventListener('click', () => showLedgerPage(i)));
+    
+    document.getElementById('ledgerPhone').addEventListener('mouseenter', () => ledgerPaused = true);
+    document.getElementById('ledgerPhone').addEventListener('mouseleave', () => ledgerPaused = false);
+    
+    // Time
+    function updateTime() {
+      const t = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+      document.getElementById('time1').textContent = t;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+  </script>
+
+</body>
+</html>

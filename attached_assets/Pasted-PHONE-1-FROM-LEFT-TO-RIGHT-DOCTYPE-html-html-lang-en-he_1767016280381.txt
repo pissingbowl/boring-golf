@@ -1,0 +1,1629 @@
+PHONE 1 (FROM LEFT TO RIGHT) 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Designer — Phone Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Core palette - from design system */
+      --fairway: #1A2F23;
+      --fairway-light: #243D2E;
+      --limestone: #F5F3EF;
+      --brass: #C9A227;
+      --brass-glow: rgba(201, 162, 39, 0.3);
+      --brass-dim: rgba(201, 162, 39, 0.15);
+      --fog: #E8E6E1;
+      --rough: #3D5A47;
+      --dusk: #6B7280;
+      --chalk: #FFFFFF;
+      --positive: #22A55B;
+      --positive-dim: rgba(34, 165, 91, 0.15);
+      --warning: #F59E0B;
+      --warning-dim: rgba(245, 158, 11, 0.15);
+      
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--limestone);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    
+    .phone-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--dusk);
+      margin-bottom: 16px;
+    }
+    
+    /* Phone Frame */
+    .phone-frame {
+      width: 280px;
+      background: linear-gradient(145deg, #4A4A4C 0%, #2D2D2F 50%, #1A1A1C 75%, #0D0D0F 100%);
+      border-radius: 44px;
+      padding: 10px;
+      box-shadow: 
+        0 50px 100px rgba(0, 0, 0, 0.25),
+        0 25px 50px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 60px var(--brass-glow);
+      animation: phoneFloat 6s ease-in-out infinite;
+    }
+    
+    @keyframes phoneFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    .phone-screen {
+      background: var(--fairway);
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      height: 580px;
+    }
+    
+    /* Gold edge glow */
+    .phone-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 36px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--brass) 0%, transparent 50%, var(--brass) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 200;
+    }
+    
+    /* Topo pattern */
+    .phone-screen::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 200 Q100 180 200 200 T400 200' fill='none' stroke='white' stroke-width='1' opacity='0.03'/%3E%3Cpath d='M0 150 Q100 130 200 150 T400 150' fill='none' stroke='white' stroke-width='1' opacity='0.03'/%3E%3Cpath d='M0 250 Q100 230 200 250 T400 250' fill='none' stroke='white' stroke-width='1' opacity='0.03'/%3E%3Cpath d='M0 100 Q100 80 200 100 T400 100' fill='none' stroke='white' stroke-width='1' opacity='0.02'/%3E%3Cpath d='M0 300 Q100 280 200 300 T400 300' fill='none' stroke='white' stroke-width='1' opacity='0.02'/%3E%3C/svg%3E");
+      background-size: cover;
+      pointer-events: none;
+    }
+    
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 26px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+    }
+    
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      z-index: 100;
+    }
+    
+    /* Screen Content */
+    .screen-content {
+      position: relative;
+      z-index: 10;
+      padding: 52px 0 24px 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header */
+    .header {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .header-icon {
+      font-size: 1.25rem;
+    }
+    
+    .header-text { flex: 1; }
+    
+    .header-title {
+      font-family: var(--font-serif);
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--chalk);
+    }
+    
+    .header-subtitle {
+      font-size: 0.625rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .header-badge {
+      font-size: 0.5625rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+      background: var(--brass-dim);
+      color: var(--brass);
+    }
+    
+    /* Trip Card */
+    .trip-card {
+      margin: 14px 18px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+    }
+    
+    .trip-name {
+      font-family: var(--font-serif);
+      font-size: 1.375rem;
+      font-weight: 500;
+      color: var(--chalk);
+      margin-bottom: 4px;
+    }
+    
+    .trip-meta {
+      font-size: 0.6875rem;
+      color: rgba(255, 255, 255, 0.5);
+      display: flex;
+      gap: 12px;
+    }
+    
+    /* Progress */
+    .progress-section {
+      padding: 0 18px 14px;
+    }
+    
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .progress-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .progress-value {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--brass);
+    }
+    
+    .progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      width: 66%;
+      background: linear-gradient(90deg, var(--brass) 0%, #D4B94A 100%);
+      border-radius: 3px;
+      box-shadow: 0 0 12px var(--brass-glow);
+      position: relative;
+    }
+    
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 30px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+    
+    /* Checklist */
+    .checklist {
+      flex: 1;
+      padding: 0 18px;
+      overflow-y: auto;
+    }
+    
+    .checklist-header {
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.4);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      animation: itemFade 0.4s ease-out backwards;
+    }
+    
+    .check-item:nth-child(2) { animation-delay: 0.05s; }
+    .check-item:nth-child(3) { animation-delay: 0.1s; }
+    .check-item:nth-child(4) { animation-delay: 0.15s; }
+    .check-item:nth-child(5) { animation-delay: 0.2s; }
+    .check-item:nth-child(6) { animation-delay: 0.25s; }
+    .check-item:nth-child(7) { animation-delay: 0.3s; }
+    
+    @keyframes itemFade {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .check-item:last-child { border-bottom: none; }
+    
+    .check-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.625rem;
+      flex-shrink: 0;
+    }
+    
+    .check-icon.done {
+      background: var(--positive);
+      color: white;
+    }
+    
+    .check-icon.active {
+      background: var(--brass-dim);
+      border: 2px solid var(--brass);
+      animation: activePulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes activePulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--brass-glow); }
+      50% { box-shadow: 0 0 0 4px rgba(201, 162, 39, 0); }
+    }
+    
+    .check-icon.pending {
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .check-content { flex: 1; }
+    
+    .check-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--chalk);
+    }
+    
+    .check-label.dim { color: rgba(255, 255, 255, 0.4); }
+    
+    .check-sublabel {
+      font-size: 0.5625rem;
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .check-status {
+      font-size: 0.5rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    
+    .check-status.done {
+      background: var(--positive-dim);
+      color: var(--positive);
+    }
+    
+    .check-status.active {
+      background: var(--brass-dim);
+      color: var(--brass);
+    }
+    
+    .check-status.pending {
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.4);
+    }
+    
+    /* CTA */
+    .cta-section {
+      padding: 14px 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .cta-button {
+      width: 100%;
+      padding: 14px;
+      background: var(--brass);
+      color: var(--fairway);
+      border: none;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px var(--brass-glow);
+    }
+    
+    .cta-arrow {
+      animation: arrowMove 1s ease-in-out infinite;
+    }
+    
+    @keyframes arrowMove {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(4px); }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="phone-label">TRIP DESIGNER</div>
+  
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="dynamic-island"></div>
+      
+      <div class="screen-content">
+        
+        <div class="header">
+          <span class="header-icon">✨</span>
+          <div class="header-text">
+            <div class="header-title">Trip Designer</div>
+            <div class="header-subtitle">Build your trip</div>
+          </div>
+          <span class="header-badge">4 of 6</span>
+        </div>
+        
+        <div class="trip-card">
+          <div class="trip-name">Pinehurst Invitational</div>
+          <div class="trip-meta">
+            <span>📍 Pinehurst, NC</span>
+            <span>📅 Dec 27–30, 2026</span>
+          </div>
+        </div>
+        
+        <div class="progress-section">
+          <div class="progress-header">
+            <span class="progress-label">Setup Progress</span>
+            <span class="progress-value">66%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+        
+        <div class="checklist">
+          <div class="checklist-header">Trip Setup</div>
+          
+          <div class="check-item">
+            <div class="check-icon done">✓</div>
+            <div class="check-content">
+              <div class="check-label">Trip Details</div>
+              <div class="check-sublabel">Name, dates, destination</div>
+            </div>
+            <span class="check-status done">Done</span>
+          </div>
+          
+          <div class="check-item">
+            <div class="check-icon done">✓</div>
+            <div class="check-content">
+              <div class="check-label">Invite Crew</div>
+              <div class="check-sublabel">8 of 8 confirmed</div>
+            </div>
+            <span class="check-status done">Done</span>
+          </div>
+          
+          <div class="check-item">
+            <div class="check-icon done">✓</div>
+            <div class="check-content">
+              <div class="check-label">Book Courses</div>
+              <div class="check-sublabel">No. 2, No. 4, No. 8</div>
+            </div>
+            <span class="check-status done">Done</span>
+          </div>
+          
+          <div class="check-item">
+            <div class="check-icon done">✓</div>
+            <div class="check-content">
+              <div class="check-label">Lodging</div>
+              <div class="check-sublabel">The Carolina Hotel</div>
+            </div>
+            <span class="check-status done">Done</span>
+          </div>
+          
+          <div class="check-item">
+            <div class="check-icon active"></div>
+            <div class="check-content">
+              <div class="check-label">Dining</div>
+              <div class="check-sublabel">2 of 4 reservations</div>
+            </div>
+            <span class="check-status active">In Progress</span>
+          </div>
+          
+          <div class="check-item">
+            <div class="check-icon pending"></div>
+            <div class="check-content">
+              <div class="check-label dim">Transportation</div>
+              <div class="check-sublabel">Shuttles & rentals</div>
+            </div>
+            <span class="check-status pending">To Do</span>
+          </div>
+        </div>
+        
+        <div class="cta-section">
+          <button class="cta-button">
+            <span>Continue Setup</span>
+            <span class="cta-arrow">→</span>
+          </button>
+        </div>
+        
+      </div>
+      
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+  
+</body>
+</html>	
+
+Phone 2 (middle)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itinerary — Phone Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Core palette - from design system */
+      --fairway: #1A2F23;
+      --fairway-light: #243D2E;
+      --limestone: #F5F3EF;
+      --brass: #C9A227;
+      --brass-glow: rgba(201, 162, 39, 0.3);
+      --brass-dim: rgba(201, 162, 39, 0.12);
+      --fog: #E8E6E1;
+      --rough: #3D5A47;
+      --dusk: #6B7280;
+      --chalk: #FFFFFF;
+      --positive: #22A55B;
+      --positive-dim: rgba(34, 165, 91, 0.12);
+      --border: rgba(26, 47, 35, 0.08);
+      
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--limestone);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    
+    .phone-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--dusk);
+      margin-bottom: 16px;
+    }
+    
+    /* Phone Frame */
+    .phone-frame {
+      width: 280px;
+      background: linear-gradient(145deg, #4A4A4C 0%, #2D2D2F 50%, #1A1A1C 75%, #0D0D0F 100%);
+      border-radius: 44px;
+      padding: 10px;
+      box-shadow: 
+        0 50px 100px rgba(0, 0, 0, 0.25),
+        0 25px 50px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 60px var(--brass-glow);
+      animation: phoneFloat 6s ease-in-out infinite 0.5s;
+    }
+    
+    @keyframes phoneFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    .phone-screen {
+      background: var(--limestone);
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      height: 580px;
+    }
+    
+    /* Gold edge glow */
+    .phone-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 36px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--brass) 0%, transparent 50%, var(--brass) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 200;
+    }
+    
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 26px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+    }
+    
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: rgba(26, 47, 35, 0.15);
+      border-radius: 2px;
+      z-index: 100;
+    }
+    
+    /* Screen Content */
+    .screen-content {
+      position: relative;
+      z-index: 10;
+      padding: 52px 0 24px 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header */
+    .header {
+      padding: 14px 18px;
+      background: var(--chalk);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--fairway);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    
+    .header-text { flex: 1; }
+    
+    .header-title {
+      font-family: var(--font-serif);
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--fairway);
+    }
+    
+    .header-subtitle {
+      font-size: 0.625rem;
+      color: var(--dusk);
+    }
+    
+    /* Day Tabs */
+    .day-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 12px 18px;
+      background: var(--chalk);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .day-tab {
+      flex: 1;
+      padding: 8px 6px;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .day-tab.active {
+      background: var(--fairway);
+    }
+    
+    .day-tab .day-name {
+      font-size: 0.5rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--dusk);
+    }
+    
+    .day-tab.active .day-name {
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .day-tab .day-num {
+      font-family: var(--font-serif);
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--fairway);
+    }
+    
+    .day-tab.active .day-num {
+      color: var(--chalk);
+    }
+    
+    .day-tab .day-label {
+      font-size: 0.4375rem;
+      color: var(--dusk);
+    }
+    
+    .day-tab.active .day-label {
+      color: var(--brass);
+    }
+    
+    /* Timeline */
+    .timeline {
+      flex: 1;
+      padding: 16px 18px;
+      overflow-y: auto;
+      background: var(--chalk);
+    }
+    
+    .timeline-item {
+      display: flex;
+      gap: 12px;
+      position: relative;
+      padding-bottom: 16px;
+      animation: itemSlide 0.5s ease-out backwards;
+    }
+    
+    .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+    .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+    .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+    
+    @keyframes itemSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .timeline-item:last-child { padding-bottom: 0; }
+    
+    /* Connecting line */
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 9px;
+      top: 26px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    
+    .timeline-time {
+      width: 44px;
+      flex-shrink: 0;
+    }
+    
+    .time-hour {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--fairway);
+    }
+    
+    .time-period {
+      font-size: 0.5rem;
+      color: var(--dusk);
+    }
+    
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.5rem;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .timeline-dot.golf {
+      background: var(--positive);
+      color: white;
+      box-shadow: 0 2px 8px rgba(34, 165, 91, 0.3);
+    }
+    
+    .timeline-dot.food {
+      background: var(--brass);
+      color: white;
+      box-shadow: 0 2px 8px var(--brass-glow);
+    }
+    
+    .timeline-dot.now {
+      animation: nowPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes nowPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 165, 91, 0.4), 0 2px 8px rgba(34, 165, 91, 0.3); }
+      50% { box-shadow: 0 0 0 6px rgba(34, 165, 91, 0), 0 2px 8px rgba(34, 165, 91, 0.3); }
+    }
+    
+    .timeline-content {
+      flex: 1;
+      background: var(--fog);
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+    }
+    
+    .timeline-content.now-card {
+      background: var(--positive-dim);
+      border-color: var(--positive);
+    }
+    
+    .event-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    
+    .now-badge {
+      font-size: 0.4375rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--positive);
+      color: white;
+      animation: badgePulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes badgePulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .event-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--fairway);
+    }
+    
+    .event-subtitle {
+      font-size: 0.625rem;
+      color: var(--dusk);
+    }
+    
+    .event-badge {
+      display: inline-block;
+      font-size: 0.4375rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin-top: 6px;
+      background: var(--positive-dim);
+      color: var(--positive);
+    }
+    
+    /* Footer */
+    .footer {
+      padding: 10px 18px;
+      background: var(--positive-dim);
+      border-top: 1px solid var(--positive);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--positive);
+      border-radius: 50%;
+      animation: livePulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes livePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 165, 91, 0.4); }
+      50% { box-shadow: 0 0 0 5px rgba(34, 165, 91, 0); }
+    }
+    
+    .live-text {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--positive);
+    }
+    
+    .live-time {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--fairway);
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="phone-label">ITINERARY</div>
+  
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="dynamic-island"></div>
+      
+      <div class="screen-content">
+        
+        <div class="header">
+          <div class="header-icon">📅</div>
+          <div class="header-text">
+            <div class="header-title">Itinerary</div>
+            <div class="header-subtitle">Pinehurst Invitational • Dec 27–30</div>
+          </div>
+        </div>
+        
+        <div class="day-tabs">
+          <div class="day-tab">
+            <div class="day-name">Sat</div>
+            <div class="day-num">27</div>
+            <div class="day-label">Arrive</div>
+          </div>
+          <div class="day-tab active">
+            <div class="day-name">Sun</div>
+            <div class="day-num">28</div>
+            <div class="day-label">Day 1</div>
+          </div>
+          <div class="day-tab">
+            <div class="day-name">Mon</div>
+            <div class="day-num">29</div>
+            <div class="day-label">Day 2</div>
+          </div>
+          <div class="day-tab">
+            <div class="day-name">Tue</div>
+            <div class="day-num">30</div>
+            <div class="day-label">Depart</div>
+          </div>
+        </div>
+        
+        <div class="timeline">
+          
+          <div class="timeline-item">
+            <div class="timeline-time">
+              <div class="time-hour">7:00</div>
+              <div class="time-period">AM</div>
+            </div>
+            <div class="timeline-dot food">🍳</div>
+            <div class="timeline-content">
+              <div class="event-title">Breakfast</div>
+              <div class="event-subtitle">Carolina Dining Room</div>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-time">
+              <div class="time-hour">9:30</div>
+              <div class="time-period">AM</div>
+            </div>
+            <div class="timeline-dot golf now">⛳</div>
+            <div class="timeline-content now-card">
+              <div class="event-time-badge">
+                <span class="now-badge">Now</span>
+              </div>
+              <div class="event-title">Tee Time — No. 2</div>
+              <div class="event-subtitle">Pinehurst Resort • All 8 players</div>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-time">
+              <div class="time-hour">2:30</div>
+              <div class="time-period">PM</div>
+            </div>
+            <div class="timeline-dot food">🥪</div>
+            <div class="timeline-content">
+              <div class="event-title">Lunch</div>
+              <div class="event-subtitle">The Deuce</div>
+              <span class="event-badge">Confirmed</span>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-time">
+              <div class="time-hour">4:30</div>
+              <div class="time-period">PM</div>
+            </div>
+            <div class="timeline-dot golf">⛳</div>
+            <div class="timeline-content">
+              <div class="event-title">Tee Time — No. 4</div>
+              <div class="event-subtitle">Groups A & B</div>
+              <span class="event-badge">Confirmed</span>
+            </div>
+          </div>
+          
+          <div class="timeline-item">
+            <div class="timeline-time">
+              <div class="time-hour">7:30</div>
+              <div class="time-period">PM</div>
+            </div>
+            <div class="timeline-dot food">🍽️</div>
+            <div class="timeline-content">
+              <div class="event-title">Dinner</div>
+              <div class="event-subtitle">1895 Grille • Party of 8</div>
+              <span class="event-badge">Confirmed</span>
+            </div>
+          </div>
+          
+        </div>
+        
+        <div class="footer">
+          <div class="live-dot"></div>
+          <span class="live-text">On the course</span>
+          <span class="live-time">10:47 AM</span>
+        </div>
+        
+      </div>
+      
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+  
+</body>
+</html>
+
+Phone 3 (right side)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roster — Phone Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Core palette - from design system */
+      --fairway: #1A2F23;
+      --fairway-light: #243D2E;
+      --limestone: #F5F3EF;
+      --brass: #C9A227;
+      --brass-glow: rgba(201, 162, 39, 0.3);
+      --brass-dim: rgba(201, 162, 39, 0.12);
+      --fog: #E8E6E1;
+      --rough: #3D5A47;
+      --dusk: #6B7280;
+      --chalk: #FFFFFF;
+      --positive: #22A55B;
+      --positive-dim: rgba(34, 165, 91, 0.12);
+      --warning: #F59E0B;
+      --warning-dim: rgba(245, 158, 11, 0.12);
+      --border: rgba(26, 47, 35, 0.08);
+      
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--limestone);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    
+    .phone-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--dusk);
+      margin-bottom: 16px;
+    }
+    
+    /* Phone Frame */
+    .phone-frame {
+      width: 280px;
+      background: linear-gradient(145deg, #4A4A4C 0%, #2D2D2F 50%, #1A1A1C 75%, #0D0D0F 100%);
+      border-radius: 44px;
+      padding: 10px;
+      box-shadow: 
+        0 50px 100px rgba(0, 0, 0, 0.25),
+        0 25px 50px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 60px var(--brass-glow);
+      animation: phoneFloat 6s ease-in-out infinite 1s;
+    }
+    
+    @keyframes phoneFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    
+    .phone-screen {
+      background: var(--fairway);
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      height: 580px;
+    }
+    
+    /* Gold edge glow */
+    .phone-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 36px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--brass) 0%, transparent 50%, var(--brass) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 200;
+    }
+    
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 26px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 100;
+    }
+    
+    .home-indicator {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      z-index: 100;
+    }
+    
+    /* Screen Content */
+    .screen-content {
+      position: relative;
+      z-index: 10;
+      padding: 52px 0 24px 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header - green like Leaderboard */
+    .header {
+      padding: 14px 18px;
+      background: linear-gradient(135deg, var(--rough) 0%, var(--fairway) 100%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .header-icon {
+      font-size: 1.25rem;
+    }
+    
+    .header-text { flex: 1; }
+    
+    .header-title {
+      font-family: var(--font-serif);
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--chalk);
+    }
+    
+    .header-subtitle {
+      font-size: 0.625rem;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .header-badge {
+      font-size: 0.625rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+      background: var(--brass);
+      color: var(--fairway);
+    }
+    
+    /* Stats Strip */
+    .stats-strip {
+      display: flex;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .stat-block {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    
+    .stat-block:last-child { border-right: none; }
+    
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--chalk);
+    }
+    
+    .stat-value.green { color: var(--positive); }
+    .stat-value.orange { color: var(--warning); }
+    .stat-value.gold { color: var(--brass); }
+    
+    .stat-label {
+      font-size: 0.5rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 2px;
+    }
+    
+    /* Player List */
+    .player-list {
+      flex: 1;
+      padding: 12px 14px;
+      overflow-y: auto;
+    }
+    
+    .player-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      animation: cardSlide 0.4s ease-out backwards;
+      position: relative;
+    }
+    
+    .player-card:nth-child(1) { animation-delay: 0.05s; }
+    .player-card:nth-child(2) { animation-delay: 0.1s; }
+    .player-card:nth-child(3) { animation-delay: 0.15s; }
+    .player-card:nth-child(4) { animation-delay: 0.2s; }
+    .player-card:nth-child(5) { animation-delay: 0.25s; }
+    
+    @keyframes cardSlide {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .player-card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--brass);
+    }
+    
+    .player-card.organizer {
+      border-left: 3px solid var(--brass);
+    }
+    
+    /* Avatar */
+    .player-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+      position: relative;
+    }
+    
+    .player-avatar.gold { background: linear-gradient(135deg, var(--brass) 0%, #8B6914 100%); }
+    .player-avatar.blue { background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%); }
+    .player-avatar.green { background: linear-gradient(135deg, var(--positive) 0%, #15803D 100%); }
+    .player-avatar.purple { background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); }
+    .player-avatar.orange { background: linear-gradient(135deg, var(--warning) 0%, #B45309 100%); }
+    
+    .status-dot {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid var(--fairway);
+    }
+    
+    .status-dot.online {
+      background: var(--positive);
+      box-shadow: 0 0 6px rgba(34, 165, 91, 0.5);
+    }
+    
+    .status-dot.pending {
+      background: var(--warning);
+      animation: pendingPulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pendingPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Player Info */
+    .player-info { flex: 1; min-width: 0; }
+    
+    .player-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .player-name {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--chalk);
+    }
+    
+    .player-badge {
+      font-size: 0.4375rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .player-badge.organizer {
+      background: var(--brass-dim);
+      color: var(--brass);
+    }
+    
+    .player-badge.team {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.6);
+    }
+    
+    .player-location {
+      font-size: 0.5625rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 2px;
+    }
+    
+    .player-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    
+    .player-tag {
+      font-size: 0.5rem;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 4px;
+    }
+    
+    .player-tag.handicap {
+      background: var(--positive-dim);
+      color: var(--positive);
+    }
+    
+    .player-tag.trips {
+      background: var(--brass-dim);
+      color: var(--brass);
+    }
+    
+    .player-tag.pending {
+      background: var(--warning-dim);
+      color: var(--warning);
+    }
+    
+    .player-arrow {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.875rem;
+    }
+    
+    /* Footer */
+    .footer {
+      padding: 10px 18px;
+      background: rgba(34, 165, 91, 0.1);
+      border-top: 1px solid var(--positive);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--positive);
+      border-radius: 50%;
+      animation: livePulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes livePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(34, 165, 91, 0.4); }
+      50% { box-shadow: 0 0 0 5px rgba(34, 165, 91, 0); }
+    }
+    
+    .live-text {
+      font-size: 0.625rem;
+      font-weight: 600;
+      color: var(--positive);
+    }
+    
+    .live-avatars {
+      margin-left: auto;
+      display: flex;
+    }
+    
+    .live-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--fairway);
+      margin-left: -6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.4375rem;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .live-avatar:first-child { margin-left: 0; }
+    .live-avatar.more {
+      background: rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.6);
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="phone-label">ROSTER</div>
+  
+  <div class="phone-frame">
+    <div class="phone-screen">
+      <div class="dynamic-island"></div>
+      
+      <div class="screen-content">
+        
+        <div class="header">
+          <span class="header-icon">👥</span>
+          <div class="header-text">
+            <div class="header-title">Roster</div>
+            <div class="header-subtitle">Pinehurst Invitational 2026</div>
+          </div>
+          <span class="header-badge">8 Players</span>
+        </div>
+        
+        <div class="stats-strip">
+          <div class="stat-block">
+            <div class="stat-value green">6</div>
+            <div class="stat-label">Confirmed</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-value orange">2</div>
+            <div class="stat-label">Pending</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-value gold">8.4</div>
+            <div class="stat-label">Avg HCP</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Trips</div>
+          </div>
+        </div>
+        
+        <div class="player-list">
+          
+          <div class="player-card organizer">
+            <div class="player-avatar gold">
+              MC
+              <div class="status-dot online"></div>
+            </div>
+            <div class="player-info">
+              <div class="player-name-row">
+                <span class="player-name">Marcus Chen</span>
+                <span class="player-badge organizer">Organizer</span>
+              </div>
+              <div class="player-location">📍 Chicago, IL</div>
+              <div class="player-tags">
+                <span class="player-tag handicap">⛳ 6.2</span>
+                <span class="player-tag trips">5 trips</span>
+              </div>
+            </div>
+            <span class="player-arrow">›</span>
+          </div>
+          
+          <div class="player-card">
+            <div class="player-avatar blue">
+              JM
+              <div class="status-dot online"></div>
+            </div>
+            <div class="player-info">
+              <div class="player-name-row">
+                <span class="player-name">Jake Morrison</span>
+                <span class="player-badge team">Team Red</span>
+              </div>
+              <div class="player-location">📍 Austin, TX</div>
+              <div class="player-tags">
+                <span class="player-tag handicap">⛳ 9.1</span>
+                <span class="player-tag trips">3 trips</span>
+              </div>
+            </div>
+            <span class="player-arrow">›</span>
+          </div>
+          
+          <div class="player-card">
+            <div class="player-avatar green">
+              DW
+              <div class="status-dot online"></div>
+            </div>
+            <div class="player-info">
+              <div class="player-name-row">
+                <span class="player-name">Devon Williams</span>
+              </div>
+              <div class="player-location">📍 Denver, CO</div>
+              <div class="player-tags">
+                <span class="player-tag handicap">⛳ 4.8</span>
+                <span class="player-tag trips">5 trips</span>
+              </div>
+            </div>
+            <span class="player-arrow">›</span>
+          </div>
+          
+          <div class="player-card">
+            <div class="player-avatar purple">
+              RO
+              <div class="status-dot online"></div>
+            </div>
+            <div class="player-info">
+              <div class="player-name-row">
+                <span class="player-name">Ryan O'Connor</span>
+              </div>
+              <div class="player-location">📍 Boston, MA</div>
+              <div class="player-tags">
+                <span class="player-tag handicap">⛳ 11.3</span>
+                <span class="player-tag trips">2 trips</span>
+              </div>
+            </div>
+            <span class="player-arrow">›</span>
+          </div>
+          
+          <div class="player-card">
+            <div class="player-avatar orange">
+              TN
+              <div class="status-dot pending"></div>
+            </div>
+            <div class="player-info">
+              <div class="player-name-row">
+                <span class="player-name">Tommy Nguyen</span>
+              </div>
+              <div class="player-location">📍 Seattle, WA</div>
+              <div class="player-tags">
+                <span class="player-tag handicap">⛳ 14.7</span>
+                <span class="player-tag pending">Awaiting</span>
+              </div>
+            </div>
+            <span class="player-arrow">›</span>
+          </div>
+          
+        </div>
+        
+        <div class="footer">
+          <div class="live-dot"></div>
+          <span class="live-text">4 online now</span>
+          <div class="live-avatars">
+            <div class="live-avatar" style="background: linear-gradient(135deg, #C9A227 0%, #8B6914 100%);">MC</div>
+            <div class="live-avatar" style="background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);">JM</div>
+            <div class="live-avatar" style="background: linear-gradient(135deg, #22A55B 0%, #15803D 100%);">DW</div>
+            <div class="live-avatar more">+1</div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,61 @@
+Replit Agent — Fix trip creation flow + post-create auth bounce
+
+We have two concrete bugs:
+
+Bug A — “Rounds” step doesn’t do anything
+
+In the trip creation wizard, the “Rounds” step is currently non-functional and only shows a generic “Ready to create your trip?” review card. For MVP, do not implement full rounds scheduling.
+
+Fix: rename this step to “Review” (or keep “Rounds” but treat it as Review) and make it explicitly the final confirmation step. The CTA should be clear: “Create Trip”.
+
+No new features. Just make the UI honest and deterministic.
+
+Bug B — After creating a trip, user is treated as signed out and sent to Home
+
+Current behavior: after clicking “Create Trip”, app navigates to home and shows “Sign in required”.
+
+This is unacceptable. After trip creation, user must be routed into the authenticated area and remain authenticated.
+
+Required behavior:
+	•	On successful trip creation (HTTP 200/201), navigate to /my-trips OR directly to the new trip page (preferred): /trips/:tripId/roster (or whatever the canonical route is).
+	•	Do NOT send user to / after creation.
+	•	Do NOT show “sign in required” if the Supabase session exists.
+
+Investigation checklist (must do in order)
+	1.	Verify the create-trip request includes Authorization header
+	•	Identify the code path for the final “Create Trip” button.
+	•	Confirm it uses the shared API client/fetch wrapper that attaches:
+Authorization: Bearer <access_token>
+	•	If it uses raw fetch, refactor it to use the shared client.
+	2.	Confirm the POST /api/trips response
+	•	Log the response status and body in the client for this action only.
+	•	If it’s 401 → token wasn’t attached or middleware is rejecting it.
+	•	If it’s 200/201 → parse returned trip id and navigate accordingly.
+	3.	Fix auth state hydration / guards
+	•	Ensure the app loads the current session on startup:
+supabase.auth.getSession() and stores it in auth state.
+	•	Ensure auth state updates via:
+supabase.auth.onAuthStateChange(...)
+	•	Ensure route guards check the actual session state, not stale cached state.
+	•	Specifically fix the case where session exists but UI still says “sign in required”.
+
+Deliverable (Definition of Done)
+
+After the fix:
+	1.	I can complete the wizard, click “Create Trip”
+	2.	The trip is created
+	3.	I land on /my-trips (or /trips/:id/roster)
+	4.	Refresh keeps me signed in
+	5.	My trip appears in the list
+	6.	No “sign in required” toast appears during normal flow
+
+Output required
+
+When done, report:
+	•	Files changed
+	•	The exact create-trip code path you fixed
+	•	The route you redirect to after success
+	•	Manual test steps I can follow
+
+Do not add any new features beyond this.
+Proceed.

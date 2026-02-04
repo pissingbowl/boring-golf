@@ -1,0 +1,147 @@
+Redesign the entire authenticated app to match the landing page aesthetic. Work through all pages systematically and make them beautiful.
+
+DESIGN SYSTEM (extract from landing page):
+- Primary color: Deep green (#1a3a2e or similar dark forest green)
+- Accent color: Gold (#d4af37)
+- Background: Cream/beige (#f5f3ed)
+- Text: Dark charcoal for body, white on dark backgrounds
+- Typography: Serif fonts for headings (elegant), sans-serif for body
+- Cards: Elevated with soft shadows, rounded corners (rounded-lg or rounded-xl)
+- Buttons: Gold primary buttons with hover states, outlined secondary buttons
+- Icons: Line-style, minimal (use lucide-react)
+- Spacing: Generous padding and margins for breathing room
+- Overall aesthetic: Country club luxury, golf resort elegance, NOT generic SaaS dashboard
+
+PAGES TO REDESIGN IN THIS ORDER:
+
+1. DASHBOARD (/trips/:tripId/dashboard)
+   - Hero section showing trip name, dates, location with elegant typography
+   - Stats cards in a grid: Confirmed Guests (with count), Upcoming Events (with count), Budget overview
+   - Quick action buttons in gold: "Invite Crew", "Add Event", "View Itinerary"
+   - Recent activity feed with timestamps
+   - Upcoming events preview (next 3-5 events in timeline format)
+   - Make it feel like the phone mockup from the landing page
+
+2. MY TRIPS (/my-trips)
+   - Trip cards should be large, elevated, with course imagery if possible
+   - Show trip name in serif heading, location and dates prominently
+   - Guest count and status badges (Planning, Confirmed, Active)
+   - Hover effects that feel interactive
+   - "Create new trip" button in gold, prominent placement
+   - Grid layout with proper spacing
+
+3. ROSTER (/trips/:tripId/roster)
+   - Player cards with personality
+   - Show profile images (or initials in colored circles)
+   - Handicap displayed as a badge
+   - RSVP status clearly indicated (Confirmed in green, Pending in gold, etc)
+   - Travel details (flight info, arrival time) in clean typography
+   - Room assignments
+   - Captain/VIP badges that stand out
+   - "Invite Member" button in gold
+
+4. ITINERARY (/trips/:tripId/itinerary)
+   - Timeline visualization (vertical timeline with events)
+   - Each event as a card with time, type icon, location
+   - Different styling for tee times (golf icon), meals (fork icon), transport (car icon)
+   - Day groupings with date headers
+   - "Add Event" floating action button
+   - Status indicators (Upcoming, In Progress, Complete)
+
+5. TOURNAMENTS (/trips/:tripId/tournaments)
+   - Tournament cards with format, rules, prize pool
+   - Team cards showing members with color coding
+   - Leaderboard with rankings, elegant table design
+   - "Create Tournament" button
+   - Active tournament highlighted
+
+6. SCORECARD (/trips/:tripId/tournaments/scorecard)
+   - Clean hole-by-hole scoring grid
+   - Player names on left, holes across top
+   - Running totals
+   - Par indicators
+   - Easy input fields
+   - Summary stats at bottom
+
+7. LEDGER (/trips/:tripId/ledger)
+   - Financial overview cards (Total Expenses, Collected, Outstanding)
+   - Member balance cards showing who owes what
+   - Transaction history table
+   - "Add Expense" and "Record Payment" buttons
+   - Visual indicators for balances (green for paid, red for owed)
+
+8. TASKS (/trips/:tripId/tasks)
+   - Kanban-style or list view of tasks
+   - Status categories (To Do, In Progress, Done)
+   - Assignee avatars
+   - Due dates with urgency indicators
+   - Priority badges
+   - "Add Task" button
+
+9. SHIPPING (/trips/:tripId/shipping)
+   - Shipment tracking cards
+   - Status timeline for each shipment
+   - Guest names and addresses
+   - Tracking numbers with copy button
+   - Issue flags for problem shipments
+
+10. MERCHANDISE (/trips/:tripId/merchandise)
+    - Product cards with images
+    - Size selection interfaces
+    - Order status tracking
+    - Collection deadline countdown
+    - "Place Order" buttons
+
+GLOBAL COMPONENTS TO UPDATE:
+
+- SIDEBAR (TripSidebar component):
+  * Dark green background
+  * Gold text for active page
+  * Icons next to each nav item
+  * Trip name at top in elegant typography
+  * "Switch Trip" button at bottom
+  * Subtle hover states
+
+- HEADER:
+  * Clean, minimal
+  * Trip name or page title on left
+  * User menu on right
+  * Breadcrumbs if helpful
+
+- BUTTONS:
+  * Primary: Gold background, dark text, rounded corners
+  * Secondary: Outlined with gold border
+  * Hover states with subtle transformations
+
+- CARDS:
+  * Cream/white backgrounds on dark green page backgrounds (or vice versa)
+  * Box shadows for elevation
+  * Rounded corners
+  * Proper padding
+
+- FORMS:
+  * Elegant input fields with borders
+  * Label typography that matches design system
+  * Gold submit buttons
+  * Validation states
+
+- EMPTY STATES:
+  * Elegant messaging ("No events scheduled yet")
+  * Icon + text + CTA button
+  * Not harsh, inviting
+
+TECHNICAL REQUIREMENTS:
+- Use Tailwind CSS utility classes
+- Maintain all existing functionality - only change styling
+- Ensure responsive design (mobile-friendly)
+- Keep all interactive elements working
+- Don't break any API calls or data fetching
+- Test each page after redesigning
+
+After completing all pages:
+1. Do a final review pass
+2. Ensure consistency across all pages
+3. Commit all changes
+4. Push to GitHub for Railway deployment
+
+Take your time and make it beautiful. This is a complete visual overhaul.

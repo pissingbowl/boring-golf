@@ -1,0 +1,129 @@
+I see it. The right version lost the structure—cards are bloated, names stacked vertically instead of flowing, too much padding, the hierarchy is gone. Let's fix it.
+
+---
+
+## The Fix: Tournaments & Games Card Design
+
+### What's Wrong (Right Screenshot)
+- Names stacked vertically = wastes space, looks like a form
+- Cards too tall, too much internal padding
+- Border/background too prominent (that mint green is loud)
+- "Scorecard" button added bulk at the bottom
+- Lost the clean, compact density of the original
+
+### What We Want
+- Names flow horizontally in chips/tags (like the left)
+- Compact cards with clear information hierarchy
+- Subtle backgrounds, not loud mint
+- High-end = **density + clarity + restraint**
+
+---
+
+## The Spec for Replit
+
+```
+## Fix: Tournaments & Games Page Styling
+
+The tournament/game cards need to be redesigned. Current styling is too bloated and poorly formatted.
+
+### Card Layout
+
+Each game card should be:
+- Compact, not tall
+- Background: var(--surface) or #F5F3EF (very subtle, not mint green)
+- Border: 1px solid rgba(26, 47, 35, 0.08) — barely visible
+- Border-radius: 12px
+- Padding: 20px 24px
+- No heavy colored borders or backgrounds
+
+### Card Header
+- Game name: 16-18px, font-weight 600, on one line
+- Type badge (e.g., "Skins", "Nassau"): small pill, muted background
+- Status badge ("Active"): green pill, keep as-is
+- Layout: Name on left, badges on right, single row
+
+### Player Names
+THIS IS CRITICAL: Players should display as **horizontal inline chips**, NOT a vertical stacked list.
+
+```css
+.player-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.player-chip {
+  background: rgba(26, 47, 35, 0.06);
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+```
+
+This keeps the card compact and scannable.
+
+### Buy-in / Prize Row
+- Single line: "Buy-in: $20 · Prize: $120"
+- Font-size: 14px
+- Color: muted (var(--muted) or #6B7280)
+- Separator: use a middle dot (·) or em dash
+
+### Rules/Description
+- Small text below, 13px, muted color
+- Max 2 lines, then truncate if needed
+
+### Card Actions (Scorecard, Delete)
+- Move to a hover state or overflow menu (three dots)
+- OR keep them but make them subtle: ghost buttons, only visible on hover
+- Do NOT make them prominent buttons that add height
+
+### Card Grid
+- Two cards per row on desktop
+- Gap: 20px
+- Cards should be similar heights (content shouldn't cause wild variation)
+
+### Section Headers ("Side Games (2)", "Games (1)")
+- Keep the icon + text + count format
+- Font: 16px, weight 500
+- Margin-bottom: 16px
+
+### Example Card Structure
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ✧ Day 1 Skins          [Skins] [Active]                   │
+│                                                             │
+│  [Marcus Chen] [Jake Morrison] [Devon Williams]            │
+│  [Ryan O'Connor] [Tommy Nguyen] [Alex Hartman]             │
+│                                                             │
+│  Buy-in: $20 · Prize: $120                                 │
+│                                                             │
+│  Tie on a hole carries value to next. All ties push to     │
+│  final hole.                                                │
+│                                                     [...] ← │ (overflow menu, optional)
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Colors to Use
+- Card background: #F8F7F5 or var(--surface)
+- Card border: rgba(26, 47, 35, 0.06)
+- Player chip background: rgba(26, 47, 35, 0.06)
+- Player chip text: var(--primary) or #1A2F23
+- Muted text: #6B7280
+- Active badge: #3D5A47 background, white text
+- Type badge: #E8E6E1 background, #1A2F23 text
+
+### Do NOT
+- Use mint/teal card backgrounds
+- Stack player names vertically
+- Make cards taller than necessary
+- Add prominent action buttons that increase card height
+- Use heavy borders or shadows
+```
+
+---
+
+That should give Replit exactly what it needs. Want me to also mock up a quick HTML snippet showing the exact card layout so there's no ambiguity?

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 1 Skins — Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0D1512;
+      --bg-card: #1A2F23;
+      --bg-row: rgba(255, 255, 255, 0.03);
+      --bg-row-hover: rgba(255, 255, 255, 0.06);
+      --bg-leader: rgba(201, 162, 39, 0.1);
+      --text-primary: #F5F3EF;
+      --text-secondary: #8A9A8F;
+      --text-muted: #5A6A5F;
+      --accent-gold: #C9A227;
+      --accent-green: #4CAF50;
+      --accent-red: #B8372D;
+      --live-red: #E53935;
+      
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* ==========================================
+       HEADER
+       ========================================== */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .back-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: transparent;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .back-btn:hover {
+      border-color: var(--accent-gold);
+      color: var(--text-primary);
+    }
+    
+    .game-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    
+    .game-badge {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    
+    .hole-indicator {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    
+    .hole-indicator strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(229, 57, 53, 0.15);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--live-red);
+    }
+    
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--live-red);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.5); }
+      50% { opacity: 0.8; box-shadow: 0 0 12px 4px rgba(229, 57, 53, 0.3); }
+    }
+    
+    /* ==========================================
+       MAIN CONTENT
+       ========================================== */
+    .main {
+      padding: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    /* ==========================================
+       LEADERBOARD TABLE
+       ========================================== */
+    .leaderboard {
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .leaderboard-header {
+      display: grid;
+      grid-template-columns: 60px 1fr 100px 120px;
+      padding: 16px 24px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+    
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 60px 1fr 100px 120px;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      align-items: center;
+      transition: background 0.15s ease;
+    }
+    
+    .leaderboard-row:hover {
+      background: var(--bg-row-hover);
+    }
+    
+    .leaderboard-row:last-child {
+      border-bottom: none;
+    }
+    
+    .leaderboard-row.leader {
+      background: var(--bg-leader);
+    }
+    
+    .leaderboard-row.leader:hover {
+      background: rgba(201, 162, 39, 0.15);
+    }
+    
+    .position {
+      font-family: var(--font-mono);
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    .leader .position {
+      color: var(--accent-gold);
+    }
+    
+    .player {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .player-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    .leader .player-avatar {
+      background: rgba(201, 162, 39, 0.2);
+      color: var(--accent-gold);
+    }
+    
+    .player-name {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    
+    .skins-count {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    
+    .leader .skins-count {
+      color: var(--accent-gold);
+    }
+    
+    .zero {
+      color: var(--text-muted);
+    }
+    
+    .winnings {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: right;
+      color: var(--accent-green);
+    }
+    
+    .winnings.zero {
+      color: var(--text-muted);
+    }
+    
+    /* ==========================================
+       STATS FOOTER
+       ========================================== */
+    .stats-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .stat-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+    
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+    
+    .stat-value.gold {
+      color: var(--accent-gold);
+    }
+    
+    .stat-value.green {
+      color: var(--accent-green);
+    }
+    
+    /* ==========================================
+       HOLE-BY-HOLE BREAKDOWN
+       ========================================== */
+    .hole-breakdown {
+      margin-top: 32px;
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    .breakdown-title {
+      padding: 16px 24px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .holes-grid {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      gap: 1px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    
+    .hole-cell {
+      background: var(--bg-card);
+      padding: 16px 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .hole-number {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    
+    .hole-winner {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .hole-winner.carry {
+      color: var(--accent-gold);
+      font-style: italic;
+    }
+    
+    .hole-value {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+    
+    .hole-value.pending {
+      color: var(--text-muted);
+    }
+    
+    /* ==========================================
+       LIVE BANNER
+       ========================================== */
+    .banner-container {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: 100%;
+      max-width: 600px;
+      padding: 0 20px;
+    }
+    
+    .live-banner {
+      background: linear-gradient(135deg, #1A2F23 0%, #0D1512 100%);
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 162, 39, 0.1);
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    
+    .live-banner.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .live-banner.exiting {
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.2s ease-in;
+    }
+    
+    .banner-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+    
+    .banner-content {
+      flex: 1;
+    }
+    
+    .banner-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-gold);
+      margin-bottom: 4px;
+    }
+    
+    .banner-message {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .banner-dismiss {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    
+    .banner-dismiss:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: var(--text-primary);
+    }
+    
+    /* ==========================================
+       GAME SWITCHER
+       ========================================== */
+    .game-switcher {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    
+    .game-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .game-tab:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-primary);
+    }
+    
+    .game-tab.active {
+      background: var(--accent-gold);
+      border-color: var(--accent-gold);
+      color: var(--bg-dark);
+    }
+    
+    /* ==========================================
+       RESPONSIVE
+       ========================================== */
+    @media (max-width: 768px) {
+      .header {
+        padding: 16px 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      
+      .main {
+        padding: 20px;
+      }
+      
+      .leaderboard-header,
+      .leaderboard-row {
+        grid-template-columns: 50px 1fr 70px 90px;
+        padding: 12px 16px;
+      }
+      
+      .player-avatar {
+        display: none;
+      }
+      
+      .skins-count {
+        font-size: 1.25rem;
+      }
+      
+      .holes-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <button class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <h1 class="game-title">Day 1 Skins</h1>
+      <span class="game-badge">Skins</span>
+    </div>
+    <div class="header-right">
+      <span class="hole-indicator">Hole <strong>9</strong> of 18</span>
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        Live
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    
+    <!-- Game Switcher -->
+    <div class="game-switcher">
+      <button class="game-tab active">Day 1 Skins</button>
+      <button class="game-tab">CTP Challenge</button>
+      <button class="game-tab">Nassau Match</button>
+    </div>
+    
+    <!-- Leaderboard -->
+    <div class="leaderboard">
+      <div class="leaderboard-header">
+        <span>Pos</span>
+        <span>Player</span>
+        <span style="text-align: center;">Skins</span>
+        <span style="text-align: right;">Winnings</span>
+      </div>
+      
+      <div class="leaderboard-row leader">
+        <span class="position">1</span>
+        <div class="player">
+          <div class="player-avatar">MC</div>
+          <span class="player-name">Marcus Chen</span>
+        </div>
+        <span class="skins-count">3</span>
+        <span class="winnings">$60</span>
+      </div>
+      
+      <div class="leaderboard-row">
+        <span class="position">2</span>
+        <div class="player">
+          <div class="player-avatar">JM</div>
+          <span class="player-name">Jake Morrison</span>
+        </div>
+        <span class="skins-count">2</span>
+        <span class="winnings">$40</span>
+      </div>
+      
+      <div class="leaderboard-row">
+        <span class="position">3</span>
+        <div class="player">
+          <div class="player-avatar">DW</div>
+          <span class="player-name">Devon Williams</span>
+        </div>
+        <span class="skins-count">1</span>
+        <span class="winnings">$20</span>
+      </div>
+      
+      <div class="leaderboard-row">
+        <span class="position">-</span>
+        <div class="player">
+          <div class="player-avatar">RO</div>
+          <span class="player-name">Ryan O'Connor</span>
+        </div>
+        <span class="skins-count zero">0</span>
+        <span class="winnings zero">—</span>
+      </div>
+      
+      <div class="leaderboard-row">
+        <span class="position">-</span>
+        <div class="player">
+          <div class="player-avatar">TN</div>
+          <span class="player-name">Tommy Nguyen</span>
+        </div>
+        <span class="skins-count zero">0</span>
+        <span class="winnings zero">—</span>
+      </div>
+      
+      <div class="leaderboard-row">
+        <span class="position">-</span>
+        <div class="player">
+          <div class="player-avatar">AH</div>
+          <span class="player-name">Alex Hartman</span>
+        </div>
+        <span class="skins-count zero">0</span>
+        <span class="winnings zero">—</span>
+      </div>
+      
+      <!-- Stats Footer -->
+      <div class="stats-footer">
+        <div class="stat">
+          <span class="stat-label">Carryover</span>
+          <span class="stat-value gold">$40 (2 holes)</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Holes Played</span>
+          <span class="stat-value">9 of 18</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Pot Remaining</span>
+          <span class="stat-value green">$60</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Hole-by-Hole Breakdown -->
+    <div class="hole-breakdown">
+      <div class="breakdown-title">Hole-by-Hole</div>
+      <div class="holes-grid">
+        <div class="hole-cell">
+          <span class="hole-number">#1</span>
+          <span class="hole-winner">Chen</span>
+          <span class="hole-value">$20</span>
+        </div>
+        <div class="hole-cell">
+          <span class="hole-number">#2</span>
+          <span class="hole-winner carry">Carry</span>
+          <span class="hole-value pending">—</span>
+        </div>
+        <div class="hole-cell">
+          <span class="hole-number">#3</span>
+          <span class="hole-winner">Morrison</span>
+          <span class="hole-value">$40</span>
+        </div>
+        <div class="hole-cell">
+          <span class="hole-number">#4</span>
+          <span class="hole-winner carry">Carry</span>
+          <span class="hole-value pending">—</span>
+        </div>
+        <div class="hole-cell">
+          <span class="hole-number">#5</span>
+          <span class="hole-winner carry">Carry</span>
+          <span class="hole-value pending">—</span>
+        </div>
+        <div class="hole-cell">
+          <span class="hole-number">#6</span>
+          <span class="hole-winner">Williams</span>
+          <span class="hole-value">$20</span>
+        </div>
+        <div class="hole-cell">
+          <span class="hole-number">#7</span>
+          <span class="hole-winner">Chen</span>
+          <span class="hole-value">$40</span>
+        </div>
+        <div class="hole-cell">
+          <span class="hole-number">#8</span>
+          <span class="hole-winner">Morrison</span>
+          <span class="hole-value">$20</span>
+        </div>
+        <div class="hole-cell">
+          <span class="hole-number">#9</span>
+          <span class="hole-winner carry">Carry</span>
+          <span class="hole-value pending">—</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Live Banner Container -->
+  <div class="banner-container">
+    <div class="live-banner" id="liveBanner">
+      <span class="banner-icon">🔥</span>
+      <div class="banner-content">
+        <div class="banner-title">Skin Won — Hole 7</div>
+        <div class="banner-message">Marcus Chen wins $40 (2-hole carryover)</div>
+      </div>
+      <button class="banner-dismiss" onclick="dismissBanner()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Banner queue system
+    const bannerQueue = [];
+    let bannerActive = false;
+    
+    const sampleBanners = [
+      {
+        icon: '🔥',
+        title: 'Skin Won — Hole 7',
+        message: 'Marcus Chen wins $40 (2-hole carryover)'
+      },
+      {
+        icon: '🎯',
+        title: 'Birdie!',
+        message: 'Jake Morrison birdies #8 to win the skin'
+      },
+      {
+        icon: '💰',
+        title: 'Carryover',
+        message: 'Hole 9 pushes — $60 carries to #10'
+      },
+      {
+        icon: '🏆',
+        title: 'New Leader',
+        message: 'Marcus Chen takes the lead with 3 skins'
+      }
+    ];
+    
+    function showBanner(bannerData) {
+      const banner = document.getElementById('liveBanner');
+      const icon = banner.querySelector('.banner-icon');
+      const title = banner.querySelector('.banner-title');
+      const message = banner.querySelector('.banner-message');
+      
+      icon.textContent = bannerData.icon;
+      title.textContent = bannerData.title;
+      message.textContent = bannerData.message;
+      
+      banner.classList.remove('exiting');
+      banner.classList.add('visible');
+      bannerActive = true;
+      
+      // Auto-dismiss after 4 seconds
+      setTimeout(() => {
+        if (bannerActive) {
+          dismissBanner();
+        }
+      }, 4000);
+    }
+    
+    function dismissBanner() {
+      const banner = document.getElementById('liveBanner');
+      banner.classList.add('exiting');
+      banner.classList.remove('visible');
+      bannerActive = false;
+      
+      // Check queue after dismiss animation
+      setTimeout(() => {
+        if (bannerQueue.length > 0) {
+          const next = bannerQueue.shift();
+          showBanner(next);
+        }
+      }, 500);
+    }
+    
+    function queueBanner(bannerData) {
+      if (bannerActive) {
+        bannerQueue.push(bannerData);
+      } else {
+        showBanner(bannerData);
+      }
+    }
+    
+    // Demo: Show banners on interval
+    let bannerIndex = 0;
+    
+    function demoBanners() {
+      queueBanner(sampleBanners[bannerIndex]);
+      bannerIndex = (bannerIndex + 1) % sampleBanners.length;
+    }
+    
+    // Start demo after 2 seconds
+    setTimeout(() => {
+      demoBanners();
+      // Then every 8 seconds
+      setInterval(demoBanners, 8000);
+    }, 2000);
+    
+    // Game tab switching
+    document.querySelectorAll('.game-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>

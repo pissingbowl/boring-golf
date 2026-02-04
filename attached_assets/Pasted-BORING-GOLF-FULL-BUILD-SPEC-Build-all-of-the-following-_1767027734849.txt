@@ -1,0 +1,289 @@
+BORING GOLF — FULL BUILD SPEC
+Build all of the following features. Work through them systematically. Don't stop until complete.
+
+1. LIVE SCHEDULE PAGE (/live-schedule)
+A gorgeous, single-screen schedule view. Masters broadcast meets PGA Tour app.
+Design:
+
+Full-bleed dark background (Fairway #1A2F23)
+Subtle topographic pattern at 3% opacity
+Trip name in Cormorant Garamond, 28px, centered
+Day progress bar (thin gold line with dot showing current position)
+
+Structure:
+
+"NOW" section with elevated current event card (white card, gold left border, subtle glow)
+"NEXT" section with upcoming events as a clean list
+"TOMORROW" section with future events
+Times in JetBrains Mono (brass), event names in Inter (white), locations in muted gray
+
+Current event card features:
+
+Pulsing green "ON COURSE" badge if it's a round
+Hole progress (e.g., "Hole 7 of 18")
+Course tip in italic (e.g., "Favor the left. Right bunker is a round-killer.")
+Player avatar dots at bottom showing who's on course
+
+Use hardcoded Pinehurst data for now.
+
+2. CHARLIE SCORECARD (/charliescorecard)
+Premium golf scorecard with live skins tracking.
+Design:
+
+Dark theme (Fairway background)
+Leaderboard at top showing all players ranked by score to par
+Toggle between SCORECARD and SKINS views
+Live feed notifications sliding in from bottom
+
+Leaderboard row:
+
+Position number (brass if top 3)
+Player avatar circle with initials
+Player name
+Score to par (green if under, red if over, white if even)
+Skins count
+
+Scorecard view:
+
+Horizontal scrolling grid
+Hole numbers across top, par below
+Player rows with tappable score cells
+Color coding: Eagle (gold), Birdie (green), Par (gray), Bogey (light red), Double+ (red)
+Running totals on right side
+
+Skins view:
+
+List of all holes played
+Shows winner or "Carryover" for each hole
+Value of each skin
+Bottom bar: "$40 carryover • 7 skins won • $100 pot left"
+
+Skins logic (auto-calculated):
+
+Lowest score on hole wins the skin
+Ties = carryover to next hole
+$20 per skin default
+Notifications when someone wins: "Marcus takes skin on #7 — $20"
+
+Pre-populate with 6 players through 9 holes so it looks live.
+
+3. INVITE FLOW
+After creating a trip, user needs to invite their crew.
+Add "Invite Crew" step to Trip Designer OR add it as a button on My Trips / Dashboard.
+Invite page (/trip/:tripId/invite):
+
+Show trip summary (name, dates, location)
+Shareable link: boringgolf.replit.app/join/[tripId]
+"Copy link" button
+"Text my crew" button (opens SMS with pre-filled message + link)
+Email input to send invites directly
+List of pending/accepted invites
+
+Join page (/join/:tripId):
+
+Shows trip details (name, dates, location, who's already in)
+"Join this trip" button
+Collects: name, email, handicap, shirt size
+After joining, redirect to trip dashboard
+
+Store invites in localStorage for now:
+typescriptinterface Invite {
+  odid: string
+  tripId: string
+  email: string
+  name?: string
+  status: 'pending' | 'accepted' | 'declined'
+  createdAt: string
+}
+```
+
+---
+
+## 4. TRIP CARD SHARE ASSET
+
+A beautiful, shareable image/card for Instagram/iMessage flexing.
+
+**Add "Share Trip" button to Dashboard that opens a modal with:**
+- Rendered trip card (designed for screenshots)
+- "Copy image" button
+- "Share" button (native share if available)
+
+**Trip card design:**
+- Vertical format (1080x1350 for Instagram)
+- Dark background with subtle texture
+- Trip name large at top (Cormorant Garamond)
+- Location with pin icon
+- Dates
+- Crew count ("6 players")
+- Course logos or names if available
+- "boringgolf.app" watermark at bottom
+
+**Render as a component that can be screenshotted or exported.**
+
+---
+
+## 5. ITINERARY BUILDER
+
+Let users add events to their trip timeline.
+
+**On Dashboard or Itinerary page, add "Add Event" button.**
+
+**Event types:**
+- Round (course, tee time, players)
+- Meal (breakfast, lunch, dinner — venue, time, reservations)
+- Activity (spa, fishing, cards, cigars — description, time, location)
+- Travel (flight, shuttle — carrier, time, from/to)
+- Free time
+
+**Add Event flow (modal or slide-up):**
+1. Select event type
+2. Fill in details based on type
+3. Pick date/time
+4. Save
+
+**Events appear in:**
+- Dashboard "Upcoming Events" section
+- Live Schedule page
+- Itinerary page as full list
+
+**Store in localStorage under the trip record.**
+
+---
+
+## 6. ROSTER PAGE IMPROVEMENTS
+
+The roster should show:
+- All confirmed players with their info
+- Pending invites (grayed out with "Invited" badge)
+- Player cards with: name, handicap, home airport, shirt size, dietary restrictions
+- "Invite more" button
+
+**Player card actions:**
+- Tap to see full details
+- Edit (if it's you or you're the organizer)
+- Remove (organizer only)
+
+---
+
+## 7. DASHBOARD IMPROVEMENTS
+
+Make the dashboard actually reflect the selected trip's data.
+
+**Header:**
+- Trip name
+- Location + dates
+- Day X of Y badge
+
+**Risk Radar section:**
+- Count of pending tasks
+- Count of shipment issues
+- Count of unconfirmed players
+
+**Stats cards:**
+- Members confirmed (X/Y)
+- Tasks pending
+- Days until trip (or "In progress" if active)
+
+**Upcoming Events:**
+- Next 4-5 events from itinerary
+- "View all" link to full itinerary
+
+**Quick actions:**
+- "Invite crew" button
+- "Add event" button
+- "Share trip" button
+
+---
+
+## 8. CONNECT TRIP DATA EVERYWHERE
+
+Right now some pages use hardcoded data. Connect them:
+
+- Dashboard should load from `getSelectedTrip()`
+- Live Schedule should load events from the trip's itinerary
+- Roster should load from trip participants
+- Scorecard should load players from roster
+
+**When no trip is selected, redirect to /my-trips.**
+
+---
+
+## 9. NAVIGATION IMPROVEMENTS
+
+**Add a way to get back to My Trips from anywhere:**
+- Small "← My Trips" link in header, OR
+- Trip name in header is tappable and goes to My Trips
+
+**Add bottom navigation for mobile (when inside a trip):**
+- Dashboard (home icon)
+- Itinerary (calendar icon)
+- Live (radio icon)
+- Roster (users icon)
+- More (menu icon → Scorecard, Ledger, Settings)
+
+---
+
+## 10. POLISH & ANIMATIONS
+
+**Page transitions:**
+- Fade in on route change (200ms)
+
+**Cards:**
+- Subtle hover elevation
+- Tap feedback on mobile
+
+**Live elements:**
+- Pulsing dots for "live" indicators
+- Slide-in animations for notifications
+- Smooth progress bar updates
+
+**Loading states:**
+- Skeleton loaders for any data-dependent sections
+- Never show empty flash before content loads
+
+---
+
+## DESIGN SYSTEM REMINDER
+
+**Colors:**
+- Fairway #1A2F23 (primary dark)
+- Limestone #F5F3EF (light background)
+- Brass #C9A227 (accent — use sparingly)
+- Fog #E8E6E1 (card surfaces)
+- Rough #3D5A47 (secondary green)
+- Chalk #FFFFFF
+- Dusk #6B7280 (muted text)
+- Positive #22A55B
+- Warning #F59E0B
+- Negative #DC2626
+
+**Fonts:**
+- Cormorant Garamond — headlines, trip names
+- Inter — body, UI
+- JetBrains Mono — numbers, times, money
+
+**Principles:**
+- Brass used like a good putter: rarely, decisively
+- Generous whitespace
+- No gradients
+- No emojis in UI
+- Animations subtle (150-300ms)
+- Mobile-first
+
+---
+
+## ROUTES TO CREATE/UPDATE
+```
+/                     — Landing page (exists)
+/trip-designer        — Create trip wizard (exists, update)
+/my-trips             — List of trips (exists)
+/dashboard            — Trip dashboard (exists, improve)
+/live-schedule        — NEW: gorgeous schedule view
+/charliescorecard     — NEW: premium scorecard
+/itinerary            — Trip timeline (exists, improve)
+/roster               — Trip participants (exists, improve)
+/trip/:tripId/invite  — NEW: invite flow
+/join/:tripId         — NEW: public join page
+
+Work through these in order. Build #1 and #2 first (the most visually impressive), then #3-4 (viral features), then #5-10 (infrastructure improvements).
+Take your time. Make it beautiful. Ship something you're proud of.

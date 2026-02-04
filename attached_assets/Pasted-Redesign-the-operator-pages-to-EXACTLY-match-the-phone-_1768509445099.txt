@@ -1,0 +1,60 @@
+Redesign the operator pages to EXACTLY match the phone mockups from the landing page.
+
+Use these mockups as the design specification:
+- Ledger mockup (3 tabs: Balances, Activity, Settle)
+- Roster mockup (player cards with stats)
+- Itinerary mockup (timeline with day selector)
+- Trip Designer mockup (dark theme, progress checklist)
+
+Color palette:
+- Background: Very dark green/black (#0A1612 or similar)
+- Headers: Dark forest green (#1A3A2E)
+- Accents: Gold (#C9A227)
+- Text: White/cream on dark backgrounds
+- Cards: Slightly lighter than background with subtle borders
+
+Typography:
+- Headings: Serif font (elegant)
+- Body: Sans-serif, clean
+
+Key elements to implement:
+
+LEDGER (/trips/:tripId/ledger):
+- Dark green hero card with large dollar amount
+- Three tabs: Balances, Activity, Settle
+- Activity tab: List of transactions with category icons (fork, flag, building, drink, shuttle)
+- Each transaction shows: icon, name, who paid, amount, participant count
+- Settle tab: Person-to-person settlement cards with initials, arrow, amount, description
+- Each settlement has "Venmo" (dark green) and "Cash" (white outline) buttons
+
+ROSTER (/trips/:tripId/roster):
+- Dark header with trip name and player count badge (gold)
+- Stats row: "6 CONFIRMED", "2 PENDING", "8.4 AVG HCP", "3 TRIPS"
+- Player cards with:
+  * Large colored circle avatar with initials
+  * Name with role badge (ORGANIZER, TEAM RED)
+  * Location icon + city
+  * Handicap icon + number
+  * Trip count badge
+  * Online indicator (green dot)
+- "4 online now" footer with mini avatars
+
+ITINERARY (/trips/:tripId/itinerary):
+- Trip name and date range at top
+- Horizontal day selector (FRI 27 Arrival, SAT 28 Day 2, etc.)
+- Timeline view:
+  * Time on left (7:00 AM, 9:30 AM, etc.)
+  * Event cards on right with icon, name, location
+  * Status badges (Now, Confirmed) in green
+  * Current time indicator at bottom (green dot + "On the course" + time)
+
+TRIP DESIGNER (/trip-designer):
+- Dark background
+- Gold star icon + "Trip Designer" heading
+- Progress indicator: "4 of 6" badge + "66%" with gold progress bar
+- Checklist items with green checkmarks
+- Gold "Continue Setup" button at bottom
+
+Make the web app look EXACTLY like these mockups. Use the same colors, spacing, typography, and component styles.
+
+Start with the Ledger page, then Roster, then Itinerary.

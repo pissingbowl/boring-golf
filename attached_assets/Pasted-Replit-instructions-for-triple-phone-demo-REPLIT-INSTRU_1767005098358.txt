@@ -1,0 +1,1022 @@
+Replit instructions for triple phone demo:
+
+REPLIT INSTRUCTIONS: Triple Phone Demo Implementation
+Overview
+Build three core features matching the phone demo on the landing page:
+1. LIVE Feed — Real-time trip awareness (light mode)
+2. Leaderboard — Game scoring and standings (dark mode)
+3. Ledger — Expense tracking and settlement (light mode)
+I've attached a reference file: triple-phone-demo-v2.html
+
+PART 1: SUPABASE SCHEMA
+Run these SQL statements in your Supabase SQL editor.
+1.1 Core Tables (if not already created)
+-- Users table (if not exists)
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255),
+  phone VARCHAR(50),
+  avatar_url TEXT,
+  venmo_username VARCHAR(100),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Trips table (if not exists)
+CREATE TABLE IF NOT EXISTS trips (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  destination VARCHAR(255),
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  status VARCHAR(50) DEFAULT 'planning' CHECK (status IN ('planning', 'upcoming', 'active', 'completed', 'cancelled')),
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Trip participants
+CREATE TABLE IF NOT EXISTS trip_participants (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  role VARCHAR(50) DEFAULT 'member' CHECK (role IN ('organizer', 'member')),
+  status VARCHAR(50) DEFAULT 'invited' CHECK (status IN ('invited', 'confirmed', 'declined')),
+  joined_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(trip_id, user_id)
+);
+1.2 Courses & Holes (for LIVE Feed + Caddie Mode)
+-- Golf courses
+CREATE TABLE courses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(255) NOT NULL,
+  location VARCHAR(255),
+  city VARCHAR(100),
+  state VARCHAR(100),
+  country VARCHAR(100) DEFAULT 'USA',
+  latitude DECIMAL(10, 8),
+  longitude DECIMAL(11, 8),
+  website_url TEXT,
+  phone VARCHAR(50),
+  par INTEGER DEFAULT 72,
+  slope_rating INTEGER,
+  course_rating DECIMAL(4, 1),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Course holes with caddie notes
+CREATE TABLE course_holes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
+  hole_number INTEGER NOT NULL CHECK (hole_number >= 1 AND hole_number <= 18),
+  par INTEGER NOT NULL CHECK (par >= 3 AND par <= 6),
+  yardage INTEGER,
+  handicap INTEGER CHECK (handicap >= 1 AND handicap <= 18),
+  caddie_notes TEXT,
+  illustration_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(course_id, hole_number)
+);
+
+-- Index for fast hole lookups
+CREATE INDEX idx_course_holes_course ON course_holes(course_id, hole_number);
+1.3 Rounds & Scoring (for Leaderboard)
+-- Golf rounds
+CREATE TABLE rounds (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
+  course_id UUID REFERENCES courses(id),
+  round_date DATE NOT NULL,
+  tee_time TIME,
+  status VARCHAR(50) DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'in_progress', 'completed', 'cancelled')),
+  current_hole INTEGER DEFAULT 1 CHECK (current_hole >= 1 AND current_hole <= 18),
+  weather_temp INTEGER,
+  weather_conditions VARCHAR(100),
+  weather_wind VARCHAR(100),
+  started_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Round participants (players in a specific round)
+CREATE TABLE round_players (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  round_id UUID REFERENCES rounds(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  tee_box VARCHAR(50) DEFAULT 'white',
+  handicap_index DECIMAL(4, 1),
+  course_handicap INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(round_id, user_id)
+);
+
+-- Hole-by-hole scores
+CREATE TABLE scores (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  round_id UUID REFERENCES rounds(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  hole_number INTEGER NOT NULL CHECK (hole_number >= 1 AND hole_number <= 18),
+  strokes INTEGER CHECK (strokes >= 1 AND strokes <= 20),
+  putts INTEGER,
+  fairway_hit BOOLEAN,
+  green_in_regulation BOOLEAN,
+  penalty_strokes INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(round_id, user_id, hole_number)
+);
+
+-- Indexes for score lookups
+CREATE INDEX idx_scores_round ON scores(round_id);
+CREATE INDEX idx_scores_user_round ON scores(user_id, round_id);
+1.4 Games & Wagers (for Leaderboard)
+-- Game types enum
+CREATE TYPE game_type AS ENUM (
+  'skins',
+  'nassau',
+  'match_play',
+  'stroke_play',
+  'stableford',
+  'best_ball',
+  'scramble',
+  'wolf',
+  'snake',
+  'bingo_bango_bongo',
+  'closest_to_pin',
+  'long_drive'
+);
+
+-- Games table
+CREATE TABLE games (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
+  round_id UUID REFERENCES rounds(id) ON DELETE SET NULL,
+  name VARCHAR(255) NOT NULL,
+  game_type game_type NOT NULL,
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'completed', 'cancelled')),
+  
+  -- Wager settings
+  buy_in DECIMAL(10, 2) DEFAULT 0,
+  per_hole_amount DECIMAL(10, 2),
+  per_skin_amount DECIMAL(10, 2),
+  carryover_enabled BOOLEAN DEFAULT true,
+  
+  -- Nassau specific
+  front_nine_amount DECIMAL(10, 2),
+  back_nine_amount DECIMAL(10, 2),
+  overall_amount DECIMAL(10, 2),
+  auto_press_enabled BOOLEAN DEFAULT false,
+  auto_press_threshold INTEGER DEFAULT 2,
+  
+  -- CTP/Long drive specific
+  designated_holes INTEGER[], -- array of hole numbers
+  
+  -- Calculated totals
+  total_pot DECIMAL(10, 2) DEFAULT 0,
+  pot_remaining DECIMAL(10, 2) DEFAULT 0,
+  
+  created_by UUID REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Game participants
+CREATE TABLE game_participants (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  buy_in_paid BOOLEAN DEFAULT false,
+  winnings DECIMAL(10, 2) DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(game_id, user_id)
+);
+
+-- Skins tracking (per hole)
+CREATE TABLE skins (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+  hole_number INTEGER NOT NULL CHECK (hole_number >= 1 AND hole_number <= 18),
+  winner_id UUID REFERENCES users(id),
+  is_carryover BOOLEAN DEFAULT false,
+  carryover_amount DECIMAL(10, 2) DEFAULT 0,
+  skin_value DECIMAL(10, 2),
+  winning_score INTEGER,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(game_id, hole_number)
+);
+
+-- CTP results
+CREATE TABLE ctp_results (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+  hole_number INTEGER NOT NULL,
+  winner_id UUID REFERENCES users(id),
+  distance_feet DECIMAL(6, 2),
+  distance_inches DECIMAL(4, 1),
+  prize_amount DECIMAL(10, 2),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(game_id, hole_number)
+);
+
+-- Game events (for live banners)
+CREATE TABLE game_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+  event_type VARCHAR(50) NOT NULL CHECK (event_type IN (
+    'skin_won', 'skin_carryover', 'birdie', 'eagle', 'hole_in_one',
+    'new_leader', 'match_update', 'ctp_leader', 'press_triggered',
+    'game_started', 'game_completed'
+  )),
+  user_id UUID REFERENCES users(id),
+  hole_number INTEGER,
+  amount DECIMAL(10, 2),
+  message TEXT,
+  icon VARCHAR(10),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_games_trip ON games(trip_id);
+CREATE INDEX idx_games_round ON games(round_id);
+CREATE INDEX idx_skins_game ON skins(game_id);
+CREATE INDEX idx_game_events_game ON game_events(game_id, created_at DESC);
+1.5 Ledger & Expenses
+-- Expense categories
+CREATE TYPE expense_category AS ENUM (
+  'lodging',
+  'golf',
+  'food',
+  'drinks',
+  'transportation',
+  'entertainment',
+  'tips',
+  'equipment',
+  'other'
+);
+
+-- Expenses table
+CREATE TABLE expenses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
+  paid_by UUID REFERENCES users(id) ON DELETE CASCADE,
+  category expense_category NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  amount DECIMAL(10, 2) NOT NULL,
+  currency VARCHAR(3) DEFAULT 'USD',
+  expense_date DATE DEFAULT CURRENT_DATE,
+  receipt_url TEXT,
+  
+  -- Split configuration
+  split_type VARCHAR(50) DEFAULT 'equal' CHECK (split_type IN ('equal', 'exact', 'percentage', 'shares')),
+  split_among UUID[], -- array of user_ids to split among (null = all participants)
+  
+  -- Status
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'disputed', 'settled')),
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Expense splits (who owes what for each expense)
+CREATE TABLE expense_splits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  expense_id UUID REFERENCES expenses(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  amount_owed DECIMAL(10, 2) NOT NULL,
+  amount_paid DECIMAL(10, 2) DEFAULT 0,
+  is_settled BOOLEAN DEFAULT false,
+  settled_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(expense_id, user_id)
+);
+
+-- Settlement transactions (when someone pays someone)
+CREATE TABLE settlements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
+  payer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  payee_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  amount DECIMAL(10, 2) NOT NULL,
+  method VARCHAR(50) CHECK (method IN ('venmo', 'cash', 'zelle', 'paypal', 'check', 'other')),
+  notes TEXT,
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'cancelled')),
+  completed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Trip balances view (calculated)
+CREATE OR REPLACE VIEW trip_balances AS
+SELECT 
+  tp.trip_id,
+  tp.user_id,
+  u.name as user_name,
+  COALESCE(paid.total_paid, 0) as total_paid,
+  COALESCE(owed.total_owed, 0) as total_owed,
+  COALESCE(paid.total_paid, 0) - COALESCE(owed.total_owed, 0) as balance
+FROM trip_participants tp
+JOIN users u ON u.id = tp.user_id
+LEFT JOIN (
+  SELECT paid_by as user_id, trip_id, SUM(amount) as total_paid
+  FROM expenses
+  GROUP BY paid_by, trip_id
+) paid ON paid.user_id = tp.user_id AND paid.trip_id = tp.trip_id
+LEFT JOIN (
+  SELECT es.user_id, e.trip_id, SUM(es.amount_owed) as total_owed
+  FROM expense_splits es
+  JOIN expenses e ON e.id = es.expense_id
+  GROUP BY es.user_id, e.trip_id
+) owed ON owed.user_id = tp.user_id AND owed.trip_id = tp.trip_id;
+
+-- Indexes
+CREATE INDEX idx_expenses_trip ON expenses(trip_id);
+CREATE INDEX idx_expenses_paid_by ON expenses(paid_by);
+CREATE INDEX idx_expense_splits_expense ON expense_splits(expense_id);
+CREATE INDEX idx_expense_splits_user ON expense_splits(user_id);
+CREATE INDEX idx_settlements_trip ON settlements(trip_id);
+1.6 LIVE Feed Content Types
+-- LIVE feed cards (for caching/customization)
+CREATE TABLE live_feed_cards (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
+  card_type VARCHAR(50) NOT NULL CHECK (card_type IN (
+    'tee_time_countdown',
+    'weather',
+    'hole_info',
+    'crew_arrival',
+    'crew_departure',
+    'dinner_reminder',
+    'bag_status',
+    'game_standings',
+    'expense_alert',
+    'custom'
+  )),
+  priority INTEGER DEFAULT 5 CHECK (priority >= 1 AND priority <= 10),
+  title VARCHAR(255),
+  subtitle TEXT,
+  icon VARCHAR(10),
+  status VARCHAR(50),
+  status_type VARCHAR(20) CHECK (status_type IN ('confirmed', 'warning', 'info')),
+  
+  -- Timing
+  show_from TIMESTAMPTZ,
+  show_until TIMESTAMPTZ,
+  
+  -- Reference data
+  reference_type VARCHAR(50),
+  reference_id UUID,
+  
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Flight tracking
+CREATE TABLE flights (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  flight_type VARCHAR(20) CHECK (flight_type IN ('arrival', 'departure')),
+  airline VARCHAR(100),
+  flight_number VARCHAR(20),
+  departure_airport VARCHAR(10),
+  arrival_airport VARCHAR(10),
+  scheduled_departure TIMESTAMPTZ,
+  scheduled_arrival TIMESTAMPTZ,
+  actual_departure TIMESTAMPTZ,
+  actual_arrival TIMESTAMPTZ,
+  status VARCHAR(50) DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'delayed', 'boarding', 'in_air', 'landed', 'cancelled')),
+  gate VARCHAR(20),
+  terminal VARCHAR(20),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Bag tracking
+CREATE TABLE bags (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trip_id UUID REFERENCES trips(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  status VARCHAR(50) DEFAULT 'with_owner' CHECK (status IN (
+    'with_owner', 'shipped', 'in_transit', 'delivered', 'at_course', 'at_bag_drop', 'missing'
+  )),
+  tracking_number VARCHAR(100),
+  carrier VARCHAR(100),
+  last_location VARCHAR(255),
+  last_updated TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_live_feed_cards_trip ON live_feed_cards(trip_id, is_active);
+CREATE INDEX idx_flights_trip ON flights(trip_id);
+CREATE INDEX idx_bags_trip ON bags(trip_id);
+1.7 Row Level Security (RLS)
+-- Enable RLS on all tables
+ALTER TABLE trips ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trip_participants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rounds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE round_players ENABLE ROW LEVEL SECURITY;
+ALTER TABLE scores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE games ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_participants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE expense_splits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE settlements ENABLE ROW LEVEL SECURITY;
+
+-- Trip access policy (participants only)
+CREATE POLICY "Users can view trips they participate in"
+  ON trips FOR SELECT
+  USING (
+    id IN (
+      SELECT trip_id FROM trip_participants WHERE user_id = auth.uid()
+    )
+  );
+
+-- Rounds access policy (trip participants)
+CREATE POLICY "Trip participants can view rounds"
+  ON rounds FOR SELECT
+  USING (
+    trip_id IN (
+      SELECT trip_id FROM trip_participants WHERE user_id = auth.uid()
+    )
+  );
+
+-- Scores access policy
+CREATE POLICY "Trip participants can view scores"
+  ON scores FOR SELECT
+  USING (
+    round_id IN (
+      SELECT r.id FROM rounds r
+      JOIN trip_participants tp ON tp.trip_id = r.trip_id
+      WHERE tp.user_id = auth.uid()
+    )
+  );
+
+-- Games access policy
+CREATE POLICY "Trip participants can view games"
+  ON games FOR SELECT
+  USING (
+    trip_id IN (
+      SELECT trip_id FROM trip_participants WHERE user_id = auth.uid()
+    )
+  );
+
+-- Expenses access policy
+CREATE POLICY "Trip participants can view expenses"
+  ON expenses FOR SELECT
+  USING (
+    trip_id IN (
+      SELECT trip_id FROM trip_participants WHERE user_id = auth.uid()
+    )
+  );
+
+PART 2: API ENDPOINTS
+2.1 LIVE Feed API
+// GET /api/trips/:tripId/live-feed
+// Returns prioritized list of LIVE cards for current context
+
+interface LiveFeedCard {
+  id: string;
+  type: 'tee_time' | 'weather' | 'hole_info' | 'crew_update' | 'dinner' | 'bags' | 'game';
+  priority: number;
+  icon: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  detail?: string;
+  quote?: string; // for caddie notes
+  status?: {
+    type: 'confirmed' | 'warning' | 'info';
+    label: string;
+  };
+  referenceId?: string;
+}
+
+// Priority logic:
+// 1. URGENT (10): Flight delay, bag missing, weather warning
+// 2. TIME_SENSITIVE (8): Tee time <2hrs, dinner <1hr
+// 3. CONTEXTUAL (6): Current hole, active game standings
+// 4. LOGISTICS (4): Bag status, flight arrivals
+// 5. AMBIENT (2): Weather, course trivia
+2.2 Leaderboard API
+// GET /api/games/:gameId/leaderboard
+// Returns current standings for a game
+
+interface LeaderboardResponse {
+  game: {
+    id: string;
+    name: string;
+    type: string;
+    status: string;
+    currentHole: number;
+    totalHoles: number;
+  };
+  standings: {
+    position: number | null; // null = no skins
+    userId: string;
+    userName: string;
+    avatarInitials: string;
+    todayScore: number; // relative to par
+    todayDisplay: string; // "-2", "E", "+3"
+    skinsCount: number;
+    winnings: number;
+  }[];
+  stats: {
+    skinsWon: number;
+    totalSkins: number;
+    carryover: number;
+    potRemaining: number;
+  };
+  recentEvents: {
+    id: string;
+    type: string;
+    icon: string;
+    title: string;
+    message: string;
+    timestamp: string;
+  }[];
+}
+
+// POST /api/games/:gameId/scores
+// Submit scores for a hole
+interface ScoreSubmission {
+  holeNumber: number;
+  scores: {
+    userId: string;
+    strokes: number;
+  }[];
+}
+2.3 Ledger API
+// GET /api/trips/:tripId/ledger
+// Returns full ledger state
+
+interface LedgerResponse {
+  summary: {
+    totalExpenses: number;
+    participantCount: number;
+    transactionCount: number;
+    unsettledCount: number;
+    pendingAmount: number;
+  };
+  balances: {
+    userId: string;
+    userName: string;
+    avatarInitials: string;
+    totalPaid: number;
+    totalOwed: number;
+    balance: number; // positive = is owed, negative = owes
+    recentActivity: string;
+  }[];
+  recentActivity: {
+    id: string;
+    type: 'expense' | 'settlement';
+    category: string;
+    icon: string;
+    title: string;
+    paidBy: string;
+    amount: number;
+    splitCount: number;
+    date: string;
+  }[];
+  settlements: {
+    id: string;
+    fromUser: { id: string; name: string; initials: string };
+    toUser: { id: string; name: string; initials: string };
+    amount: number;
+    reason: string;
+    status: 'pending' | 'completed';
+  }[];
+}
+
+// POST /api/trips/:tripId/expenses
+// Add new expense
+interface ExpenseSubmission {
+  category: string;
+  title: string;
+  amount: number;
+  expenseDate: string;
+  splitType: 'equal' | 'exact' | 'percentage';
+  splitAmong?: string[]; // user IDs, null = all
+  receiptUrl?: string;
+}
+
+// POST /api/trips/:tripId/settlements
+// Record a settlement
+interface SettlementSubmission {
+  payeeId: string;
+  amount: number;
+  method: 'venmo' | 'cash' | 'zelle' | 'other';
+  notes?: string;
+}
+
+PART 3: COMPONENT IMPLEMENTATION
+3.1 LIVE Feed Component
+Route: /trip/[tripId]/live (or sidebar component)
+
+Structure:
+┌─────────────────────────────────────────┐
+│ ● LIVE                     2:47 PM      │  ← Header with pulsing dot
+├─────────────────────────────────────────┤
+│ Pinehurst Invitational    Day 2 of 4    │  ← Trip context bar (dark bg)
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │  ⏱ COMING UP                   │   │
+│  │                                 │   │
+│  │        1h 23m                   │   │  ← Rotating cards
+│  │     until tee time              │   │
+│  │                                 │   │
+│  │  Pinehurst No. 2 • 4:10 PM     │   │
+│  │         ✓ Confirmed            │   │
+│  └─────────────────────────────────┘   │
+│                                         │
+│         ●━━━ ○ ○ ○ ○ ○                 │  ← Navigation dots
+│                                         │
+│         ───────────────                 │  ← Home indicator
+└─────────────────────────────────────────┘
+
+Card types to implement:
+1. Tee Time Countdown - gold gradient text for time
+2. Weather - emoji icon, temp, conditions
+3. Hole Info - hole number, par, yards, caddie quote (serif italic)
+4. Crew Update - plane emoji, name, airport, ETA
+5. Dinner - restaurant emoji, name, time, party size
+6. Bags - backpack emoji, count, status
+7. Game Standings - trophy emoji, leader name, stats
+
+Behavior:
+- Auto-rotate every 4.5 seconds
+- Pause on hover/touch
+- Smooth transitions (0.55s cubic-bezier)
+- Cards slide up/fade
+3.2 Leaderboard Component
+Route: /trip/[tripId]/games/[gameId]/leaderboard
+
+Structure (dark mode):
+┌─────────────────────────────────────────┐
+│ Day 1 Skins  [$20/hole]  ● LIVE        │  ← Header
+├─────────────────────────────────────────┤
+│ Hole 12 of 18          7 skins won     │
+│ ████████████████░░░░░░░░░░░            │  ← Progress bar (gold)
+├─────────────────────────────────────────┤
+│ #  PLAYER              TODAY    SKINS   │  ← Table header
+├─────────────────────────────────────────┤
+│ 1  [MC] Marcus Chen     -2      4 $80   │  ← Leader row (gold bg)
+│ 2  [JM] Jake Morrison   -1      2 $40   │
+│ 3  [DW] Devon Williams   E      1 $20   │
+│ -  [RO] Ryan O'Connor   +3      0       │
+│ -  [TN] Tommy Nguyen    +5      0       │
+│ -  [AH] Alex Hartman    +2      0       │
+├─────────────────────────────────────────┤
+│  $40        7           $100            │  ← Footer stats
+│ Carryover  Skins Won   Pot Left         │
+└─────────────────────────────────────────┘
+
+Live banner (slides up from bottom):
+┌─────────────────────────────────────────┐
+│ 🔥 SKIN WON — HOLE 12                   │
+│    Marcus wins $40                       │
+└─────────────────────────────────────────┘
+
+Score colors:
+- Under par (-1, -2): green (#4CAF50)
+- Even (E): gray
+- Over par (+1, +2): red (#EF4444)
+
+Banner event types:
+- skin_won: 🔥 gold border
+- birdie: 🐦 
+- eagle: 🦅
+- carryover: 💰
+- new_leader: 🏆
+3.3 Ledger Component
+Route: /trip/[tripId]/ledger
+
+Structure:
+┌─────────────────────────────────────────┐
+│ [💳] Trip Ledger         3 unsettled    │  ← Header
+├─────────────────────────────────────────┤
+│        TOTAL TRIP EXPENSES              │
+│            $4,847                        │  ← Summary (dark bg)
+│     8 people • 23 transactions          │
+├─────────────────────────────────────────┤
+│  Balances │ Activity │ Settle           │  ← Tabs
+├─────────────────────────────────────────┤
+
+TAB 1: Balances
+│ [MC] Marcus Chen              +$142     │
+│      Paid for dinner, cart    is owed   │
+│ [JM] Jake Morrison            +$89      │
+│      Paid for lodging         is owed   │
+│ [DW] Devon Williams           $0        │
+│      All settled up           settled   │
+│ [RO] Ryan O'Connor            -$67      │
+│      Owes for dinner          owes      │
+
+TAB 2: Activity
+│ [🍽️] Dinner at The Deuce     $847      │
+│      Marcus paid • Yesterday   ÷8       │
+│ [⛳] Golf Cart Rental         $320      │
+│      Marcus paid • Yesterday   ÷4       │
+│ [🏨] Lodging Deposit          $2,400    │
+│      Jake paid • Dec 15        ÷8       │
+
+TAB 3: Settle
+│ ┌─────────────────────────────────┐     │
+│ │ [RO] → [MC]              $67    │     │
+│ │ For dinner, golf cart           │     │
+│ │ [Venmo]  [Mark Paid]           │     │
+│ └─────────────────────────────────┘     │
+
+├─────────────────────────────────────────┤
+│ [📧] Send Trip Receipt                  │  ← Action button (rotates)
+│ [📷] Upload Receipt                     │
+│ [⬇️] Export Summary                     │
+└─────────────────────────────────────────┘
+
+Badge text per tab:
+- Balances: "3 unsettled"
+- Activity: "23 transactions"
+- Settle: "$153 pending"
+
+Auto-rotate tabs every 5 seconds (pause on hover)
+
+PART 4: STYLING REQUIREMENTS
+4.1 Color Palette
+/* Light mode (LIVE, Ledger) */
+--primary: #1A2F23;
+--background: #F5F3EF;
+--surface: #FFFFFF;
+--accent: #C9A227;
+--accent-light: #D4B94A;
+--secondary: #3D5A47;
+--muted: #6B7280;
+--live-red: #B8372D;
+--positive: #4CAF50;
+--negative: #EF4444;
+
+/* Dark mode (Leaderboard) */
+--bg-dark: #0D1512;
+--bg-card: #1A2F23;
+--text-primary: #F5F3EF;
+--text-secondary: #8A9A8F;
+--text-muted: #5A6A5F;
+4.2 Typography
+--font-serif: 'Cormorant Garamond', Georgia, serif;  /* Headlines, quotes */
+--font-sans: 'Inter', -apple-system, sans-serif;     /* Body, UI */
+--font-mono: 'JetBrains Mono', monospace;            /* Numbers, scores */
+4.3 Animation Timing
+/* Card transitions */
+transition: all 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+
+/* Live dot pulse */
+animation: pulse 2.5s ease-in-out infinite;
+
+/* Auto-rotation intervals */
+LIVE cards: 4500ms
+Ledger tabs: 5000ms
+Leaderboard banners: 6000ms (visible for 3500ms)
+
+PART 5: REFERENCE FILE
+I've attached triple-phone-demo-v2.html which contains:
+* Complete working demo of all three phone screens
+* All CSS styling
+* JavaScript for animations and tab switching
+* Exact structure and timing
+Use this as your visual reference and copy styles directly.
+
+PART 6: IMPLEMENTATION ORDER
+1. Database first — Run all SQL migrations
+2. API routes — Build the three main endpoints
+3. LIVE Feed — Easiest, mostly display logic
+4. Leaderboard — Requires score submission + calculations
+5. Ledger — Most complex, expense splitting logic
+6. Real-time — Add Supabase subscriptions for live updates
+
+PART 7: RECEIPT UPLOADS (Supabase Storage)
+7.1 Create Storage Bucket
+In Supabase Dashboard → Storage → Create bucket:
+* Name: receipts
+* Public: No (private)
+* File size limit: 10MB
+* Allowed MIME types: image/jpeg, image/png, image/heic, application/pdf
+7.2 Storage Policies
+-- Allow users to upload receipts for trips they're part of
+CREATE POLICY "Users can upload receipts for their trips"
+ON storage.objects FOR INSERT
+WITH CHECK (
+  bucket_id = 'receipts' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT trip_id FROM trip_participants WHERE user_id = auth.uid()
+  )
+);
+
+-- Allow users to view receipts for their trips
+CREATE POLICY "Users can view receipts for their trips"
+ON storage.objects FOR SELECT
+USING (
+  bucket_id = 'receipts' AND
+  (storage.foldername(name))[1]::uuid IN (
+    SELECT trip_id FROM trip_participants WHERE user_id = auth.uid()
+  )
+);
+7.3 Upload Flow
+// Client-side upload
+async function uploadReceipt(tripId: string, file: File) {
+  const fileName = `${tripId}/${Date.now()}-${file.name}`;
+  
+  const { data, error } = await supabase.storage
+    .from('receipts')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+  
+  if (error) throw error;
+  
+  // Get signed URL (valid 1 hour)
+  const { data: urlData } = await supabase.storage
+    .from('receipts')
+    .createSignedUrl(fileName, 3600);
+  
+  return urlData.signedUrl;
+}
+7.4 Receipt Capture UI
+┌─────────────────────────────────────────┐
+│ 📷 Upload Receipt                       │
+├─────────────────────────────────────────┤
+│                                         │
+│     ┌───────────────────────┐          │
+│     │                       │          │
+│     │    📷 Take Photo      │          │
+│     │         or            │          │
+│     │    Choose from Library│          │
+│     │                       │          │
+│     └───────────────────────┘          │
+│                                         │
+│  Supported: JPG, PNG, HEIC, PDF         │
+│  Max size: 10MB                         │
+│                                         │
+└─────────────────────────────────────────┘
+
+PART 8: VENMO DEEP LINKS
+8.1 Venmo URL Scheme
+// Venmo deep link format
+function generateVenmoLink(
+  recipientUsername: string,
+  amount: number,
+  note: string
+): string {
+  const params = new URLSearchParams({
+    txn: 'pay',
+    recipients: recipientUsername,
+    amount: amount.toFixed(2),
+    note: note,
+  });
+  
+  // Mobile deep link (opens app)
+  const mobileLink = `venmo://paycharge?${params.toString()}`;
+  
+  // Web fallback
+  const webLink = `https://venmo.com/?${params.toString()}`;
+  
+  return mobileLink;
+}
+
+// Example usage
+const link = generateVenmoLink(
+  'marcus-chen-42',  // Venmo username
+  67.00,             // Amount
+  'Pinehurst Trip - Dinner + Golf Cart'  // Note
+);
+// Result: venmo://paycharge?txn=pay&recipients=marcus-chen-42&amount=67.00&note=Pinehurst%20Trip%20-%20Dinner%20%2B%20Golf%20Cart
+8.2 Settlement Card with Venmo
+<div className="settle-card">
+  <div className="settle-header">
+    <div className="settle-avatars">
+      <Avatar initials="RO" />
+      <span>→</span>
+      <Avatar initials="MC" />
+    </div>
+    <div className="settle-info">
+      <div className="settle-title">Ryan → Marcus</div>
+      <div className="settle-desc">For dinner, golf cart</div>
+    </div>
+    <div className="settle-amount">$67</div>
+  </div>
+  <div className="settle-methods">
+    <a 
+      href={generateVenmoLink(marcus.venmoUsername, 67, 'Pinehurst - Dinner')}
+      className="settle-method venmo"
+    >
+      <VenmoIcon /> Pay with Venmo
+    </a>
+    <button 
+      onClick={() => markAsPaid(settlementId)}
+      className="settle-method primary"
+    >
+      Mark Paid
+    </button>
+  </div>
+</div>
+8.3 Venmo Username Storage
+Already included in users table:
+venmo_username VARCHAR(100)  -- e.g., 'marcus-chen-42'
+Prompt users to add their Venmo username in profile settings for seamless payments.
+
+PART 9: REAL-TIME UPDATES (Supabase Realtime)
+Recommended: WebSocket via Supabase Realtime for leaderboard (instant gratification when someone wins a skin).
+9.1 Enable Realtime on Tables
+-- Enable realtime for key tables
+ALTER PUBLICATION supabase_realtime ADD TABLE scores;
+ALTER PUBLICATION supabase_realtime ADD TABLE skins;
+ALTER PUBLICATION supabase_realtime ADD TABLE game_events;
+ALTER PUBLICATION supabase_realtime ADD TABLE expenses;
+ALTER PUBLICATION supabase_realtime ADD TABLE settlements;
+9.2 Client Subscriptions
+// Leaderboard real-time updates
+const subscribeToGame = (gameId: string, onUpdate: () => void) => {
+  return supabase
+    .channel(`game-${gameId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'scores',
+        filter: `round_id=eq.${roundId}`
+      },
+      onUpdate
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'game_events',
+        filter: `game_id=eq.${gameId}`
+      },
+      (payload) => {
+        // Show live banner
+        showBanner(payload.new);
+      }
+    )
+    .subscribe();
+};
+
+// Ledger real-time updates
+const subscribeToLedger = (tripId: string, onUpdate: () => void) => {
+  return supabase
+    .channel(`ledger-${tripId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'expenses',
+        filter: `trip_id=eq.${tripId}`
+      },
+      onUpdate
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'settlements',
+        filter: `trip_id=eq.${tripId}`
+      },
+      onUpdate
+    )
+    .subscribe();
+};
+9.3 Cleanup
+// Always unsubscribe on unmount
+useEffect(() => {
+  const subscription = subscribeToGame(gameId, refetchLeaderboard);
+  
+  return () => {
+    supabase.removeChannel(subscription);
+  };
+}, [gameId]);
+
+PART 10: IMPLEMENTATION ORDER (Updated)
+1. Database — Run all SQL migrations in order
+2. Storage — Create receipts bucket + policies
+3. Auth flow — Ensure Supabase Auth is working
+4. API routes — Build endpoints
+5. LIVE Feed — Display-only, easiest start
+6. Leaderboard — Score entry + calculations + real-time
+7. Ledger — Expense CRUD + splitting + settlements
+8. Venmo integration — Deep links on settle cards
+9. Receipt upload — Camera/file picker + storage
+10. Real-time — Enable subscriptions for live updates
+
+CONFIRMED CONFIGURATION
+* ✅ Fresh database — all tables will be created
+* ✅ Supabase Auth — RLS policies use auth.uid()
+* ✅ Real-time via WebSocket — Supabase Realtime for instant updates
+* ✅ Receipt uploads — Supabase Storage with receipts bucket
+* ✅ Venmo deep links — Pre-filled payment links
