@@ -43,4 +43,6 @@ http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': types[ext] || 'application/octet-stream' });
     res.end(data);
   });
-}).listen(port, () => console.log('Boring Golf welcome page running on port ' + port));
+}).listen(port, '0.0.0.0', () =>
+  console.log('Boring Golf store running on 0.0.0.0:' + port)
+);
