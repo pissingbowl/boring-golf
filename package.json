@@ -1,0 +1,12 @@
+{
+  "name": "boring-golf-welcome",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Boring Golf — welcome / landing page (static, self-contained)",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
