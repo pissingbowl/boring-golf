@@ -1,10 +1,13 @@
 // Minimal zero-dependency static server for Railway.
-// Railway provides the PORT env var; we serve index.html (fully self-contained).
+// Railway injects PORT — we must listen on 0.0.0.0 so public routing works.
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const port = process.env.PORT || 3000;
+const port = Number(process.env.PORT) || 3000;
+const host = '0.0.0.0';
+const root = __dirname;
+
 const types = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript',
@@ -17,32 +20,54 @@ const types = {
   '.ico': 'image/x-icon',
 };
 
-http.createServer((req, res) => {
-  let urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
-  if (urlPath === '/' || urlPath === '') urlPath = '/index.html';
-
-  // Resolve safely inside this folder
-  const filePath = path.join(__dirname, path.normalize(urlPath));
-  if (!filePath.startsWith(__dirname)) {
-    res.writeHead(403);
-    res.end('Forbidden');
-    return;
+function safePath(urlPath) {
+  const clean = decodeURIComponent((urlPath || '/').split('?')[0]);
+  const relative = clean === '/' || clean === '' ? 'index.html' : clean.replace(/^\/+/, '');
+  const filePath = path.resolve(root, relative);
+  if (!filePath.startsWith(root + path.sep) && filePath !== root) {
+    return null;
   }
+  return filePath;
+}
 
+function sendFile(res, filePath, contentType) {
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      // SPA-style fallback: anything unknown serves the page
-      fs.readFile(path.join(__dirname, 'index.html'), (e2, home) => {
-        if (e2) { res.writeHead(404); res.end('Not found'); return; }
+      fs.readFile(path.join(root, 'index.html'), (e2, home) => {
+        if (e2) {
+          res.writeHead(404);
+          res.end('Not found');
+          return;
+        }
         res.writeHead(200, { 'Content-Type': types['.html'] });
         res.end(home);
       });
       return;
     }
-    const ext = path.extname(filePath).toLowerCase();
-    res.writeHead(200, { 'Content-Type': types[ext] || 'application/octet-stream' });
+    res.writeHead(200, { 'Content-Type': contentType || 'application/octet-stream' });
     res.end(data);
   });
-}).listen(port, '0.0.0.0', () =>
-  console.log('Boring Golf store running on 0.0.0.0:' + port)
-);
+}
+
+http
+  .createServer((req, res) => {
+    if (req.url === '/health' || req.url === '/healthz') {
+      res.writeHead(200, { 'Content-Type': 'text/plain' });
+      res.end('ok');
+      return;
+    }
+
+    const filePath = safePath(req.url);
+    if (!filePath) {
+      res.writeHead(403);
+      res.end('Forbidden');
+      return;
+    }
+
+    const ext = path.extname(filePath).toLowerCase();
+    sendFile(res, filePath, types[ext]);
+  })
+  .listen(port, host, () => {
+    console.log(`Boring Golf store listening on http://${host}:${port}`);
+    console.log(`Serving files from ${root}`);
+  });
