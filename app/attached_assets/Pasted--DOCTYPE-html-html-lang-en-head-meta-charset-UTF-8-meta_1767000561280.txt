@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itinerary Builder — Boring Golf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1A2F23;
+      --background: #F5F3EF;
+      --surface: #FFFFFF;
+      --accent: #C9A227;
+      --secondary: #3D5A47;
+      --muted: #6B7280;
+      --border: rgba(26, 47, 35, 0.1);
+      --live-red: #B8372D;
+      
+      --meal: #E67E22;
+      --meal-bg: rgba(230, 126, 34, 0.1);
+      --golf: #27AE60;
+      --golf-bg: rgba(39, 174, 96, 0.1);
+      --transport: #3498DB;
+      --transport-bg: rgba(52, 152, 219, 0.1);
+      --lodging: #9B59B6;
+      --lodging-bg: rgba(155, 89, 182, 0.1);
+      --activity: #E91E63;
+      --activity-bg: rgba(233, 30, 99, 0.1);
+      --logistics: #607D8B;
+      --logistics-bg: rgba(96, 125, 139, 0.1);
+      
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--background);
+      color: var(--primary);
+      min-height: 100vh;
+      display: flex;
+    }
+    
+    /* ==========================================
+       SIDEBAR
+       ========================================== */
+    .sidebar {
+      width: 240px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .sidebar-brand-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--secondary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+    
+    .sidebar-brand-text {
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+    
+    .sidebar-brand-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--primary);
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    
+    .nav-item:hover {
+      background: rgba(26, 47, 35, 0.04);
+    }
+    
+    .nav-item.active {
+      background: rgba(26, 47, 35, 0.06);
+    }
+    
+    .nav-item.live {
+      color: var(--live-red);
+      font-weight: 600;
+    }
+    
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--live-red);
+      border-radius: 50%;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(184, 55, 45, 0.5); }
+      50% { box-shadow: 0 0 10px 5px rgba(184, 55, 45, 0.15); }
+    }
+    
+    .nav-section {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: 16px 12px 8px;
+    }
+    
+    .nav-item svg {
+      width: 20px;
+      height: 20px;
+      opacity: 0.7;
+    }
+    
+    /* ==========================================
+       MAIN CONTENT
+       ========================================== */
+    .main {
+      flex: 1;
+      margin-left: 240px;
+      padding: 32px;
+      max-width: 900px;
+    }
+    
+    .page-header {
+      margin-bottom: 24px;
+    }
+    
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .page-subtitle {
+      font-size: 0.9375rem;
+      color: var(--muted);
+    }
+    
+    /* ==========================================
+       EVENT BLOCK POOL
+       ========================================== */
+    .block-pool {
+      background: var(--surface);
+      border-radius: 16px;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+    }
+    
+    .block-pool-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    
+    .block-pool-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    
+    .block-pool-toggle {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .block-pool-content {
+      padding: 20px;
+    }
+    
+    .block-pool-content.collapsed {
+      display: none;
+    }
+    
+    .block-category {
+      margin-bottom: 20px;
+    }
+    
+    .block-category:last-child {
+      margin-bottom: 0;
+    }
+    
+    .block-category-title {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    
+    .block-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .draggable-block {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: grab;
+      transition: all 0.15s ease;
+      user-select: none;
+      min-width: 100px;
+    }
+    
+    .draggable-block:hover {
+      border-color: var(--accent);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .draggable-block:active {
+      cursor: grabbing;
+      transform: scale(1.02);
+    }
+    
+    .draggable-block.dragging {
+      opacity: 0.5;
+    }
+    
+    .block-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+    
+    .block-label {
+      font-size: 0.8125rem;
+      font-weight: 500;
+    }
+    
+    /* Category colors */
+    .draggable-block.meal { background: var(--meal-bg); border-color: rgba(230, 126, 34, 0.3); }
+    .draggable-block.golf { background: var(--golf-bg); border-color: rgba(39, 174, 96, 0.3); }
+    .draggable-block.transport { background: var(--transport-bg); border-color: rgba(52, 152, 219, 0.3); }
+    .draggable-block.lodging { background: var(--lodging-bg); border-color: rgba(155, 89, 182, 0.3); }
+    .draggable-block.activity { background: var(--activity-bg); border-color: rgba(233, 30, 99, 0.3); }
+    .draggable-block.logistics { background: var(--logistics-bg); border-color: rgba(96, 125, 139, 0.3); }
+    
+    /* ==========================================
+       DAY SCHEDULE
+       ========================================== */
+    .day-schedule {
+      margin-bottom: 24px;
+    }
+    
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 2px solid var(--primary);
+      margin-bottom: 16px;
+    }
+    
+    .day-title {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+    
+    .day-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    .event-list {
+      min-height: 80px;
+      background: rgba(26, 47, 35, 0.02);
+      border-radius: 12px;
+      padding: 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .event-list.drag-over {
+      background: rgba(201, 162, 39, 0.1);
+      border: 2px dashed var(--accent);
+    }
+    
+    .event-card {
+      display: flex;
+      align-items: stretch;
+      background: var(--surface);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: all 0.15s ease;
+    }
+    
+    .event-card:last-child {
+      margin-bottom: 0;
+    }
+    
+    .event-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .event-card.dragging {
+      opacity: 0.5;
+      transform: scale(0.98);
+    }
+    
+    .event-drag-handle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      background: rgba(26, 47, 35, 0.03);
+      cursor: grab;
+      color: var(--muted);
+      transition: all 0.15s ease;
+    }
+    
+    .event-drag-handle:hover {
+      background: rgba(26, 47, 35, 0.06);
+      color: var(--primary);
+    }
+    
+    .event-drag-handle:active {
+      cursor: grabbing;
+    }
+    
+    .event-color-bar {
+      width: 4px;
+    }
+    
+    .event-color-bar.meal { background: var(--meal); }
+    .event-color-bar.golf { background: var(--golf); }
+    .event-color-bar.transport { background: var(--transport); }
+    .event-color-bar.lodging { background: var(--lodging); }
+    .event-color-bar.activity { background: var(--activity); }
+    .event-color-bar.logistics { background: var(--logistics); }
+    
+    .event-content {
+      flex: 1;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .event-time {
+      min-width: 70px;
+      text-align: center;
+    }
+    
+    .event-time-value {
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+    
+    .event-time-period {
+      font-size: 0.6875rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    
+    .event-details {
+      flex: 1;
+    }
+    
+    .event-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    
+    .event-icon {
+      font-size: 1rem;
+    }
+    
+    .event-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+    
+    .event-badge {
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+    
+    .event-badge.meal { background: var(--meal-bg); color: var(--meal); }
+    .event-badge.golf { background: var(--golf-bg); color: var(--golf); }
+    .event-badge.transport { background: var(--transport-bg); color: var(--transport); }
+    .event-badge.lodging { background: var(--lodging-bg); color: var(--lodging); }
+    .event-badge.activity { background: var(--activity-bg); color: var(--activity); }
+    .event-badge.logistics { background: var(--logistics-bg); color: var(--logistics); }
+    
+    .event-badge.locked { background: rgba(184, 55, 45, 0.1); color: var(--live-red); }
+    .event-badge.soft { background: rgba(201, 162, 39, 0.1); color: var(--accent); }
+    .event-badge.open { background: rgba(96, 125, 139, 0.1); color: var(--muted); }
+    
+    .event-location {
+      font-size: 0.8125rem;
+      color: var(--muted);
+    }
+    
+    .event-confirmation {
+      font-size: 0.75rem;
+      color: var(--golf);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+    
+    .event-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-right: 12px;
+    }
+    
+    .event-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    
+    .event-action-btn:hover {
+      background: rgba(26, 47, 35, 0.06);
+      color: var(--primary);
+    }
+    
+    .event-action-btn.delete:hover {
+      background: rgba(184, 55, 45, 0.1);
+      color: var(--live-red);
+    }
+    
+    .event-action-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    /* Drop Zone */
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    
+    .drop-zone.active {
+      border-color: var(--accent);
+      background: rgba(201, 162, 39, 0.05);
+      color: var(--accent);
+    }
+    
+    .drop-zone-icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    
+    /* ==========================================
+       EDIT MODAL
+       ========================================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+    
+    .modal-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal {
+      background: var(--surface);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(20px);
+      transition: transform 0.2s ease;
+    }
+    
+    .modal-overlay.visible .modal {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .modal-icon {
+      font-size: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+    
+    .modal-body {
+      padding: 24px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--primary);
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9375rem;
+      font-family: var(--font-sans);
+      transition: border-color 0.15s ease;
+    }
+    
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
+    }
+    
+    .status-options {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .status-option {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .status-option:hover {
+      border-color: var(--accent);
+    }
+    
+    .status-option.selected {
+      border-color: var(--accent);
+      background: rgba(201, 162, 39, 0.1);
+    }
+    
+    .status-option-icon {
+      font-size: 1.25rem;
+      margin-bottom: 4px;
+    }
+    
+    .status-option-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--primary);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(26, 47, 35, 0.04);
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      border: 1px solid var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--secondary);
+    }
+    
+    /* ==========================================
+       RESPONSIVE
+       ========================================== */
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      
+      .main {
+        margin-left: 0;
+        padding: 20px;
+      }
+      
+      .block-grid {
+        gap: 6px;
+      }
+      
+      .draggable-block {
+        padding: 8px 12px;
+        min-width: 90px;
+      }
+      
+      .event-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .event-time {
+        min-width: auto;
+        text-align: left;
+      }
+      
+      .event-actions {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+      }
+      
+      .event-card {
+        position: relative;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+          <line x1="4" y1="22" x2="4" y2="15"></line>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-brand-text">Golf Ops</div>
+        <div class="sidebar-brand-sub">Trip Coordinator</div>
+      </div>
+    </div>
+    
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      Home
+    </a>
+    
+    <a href="#" class="nav-item live">
+      <div class="live-dot"></div>
+      LIVE
+    </a>
+    
+    <div class="nav-section">Operations</div>
+    
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+      </svg>
+      Trip Designer
+    </a>
+    
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      Dashboard
+    </a>
+    
+    <a href="#" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      Itinerary
+    </a>
+    
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      Roster
+    </a>
+    
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      Tasks
+    </a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    
+    <div class="page-header">
+      <h1 class="page-title">Itinerary</h1>
+      <p class="page-subtitle">Pinehurst Invitational — Dec 29 to Jan 1, 2026</p>
+    </div>
+    
+    <!-- Event Block Pool -->
+    <div class="block-pool">
+      <div class="block-pool-header" onclick="togglePool()">
+        <span class="block-pool-title">Event Blocks</span>
+        <span class="block-pool-toggle" id="poolToggle">Collapse</span>
+      </div>
+      <div class="block-pool-content" id="poolContent">
+        
+        <div class="block-category">
+          <div class="block-category-title">Meals</div>
+          <div class="block-grid">
+            <div class="draggable-block meal" draggable="true" data-type="breakfast" data-category="meal">
+              <span class="block-icon">🍳</span>
+              <span class="block-label">Breakfast</span>
+            </div>
+            <div class="draggable-block meal" draggable="true" data-type="brunch" data-category="meal">
+              <span class="block-icon">🥂</span>
+              <span class="block-label">Brunch</span>
+            </div>
+            <div class="draggable-block meal" draggable="true" data-type="lunch" data-category="meal">
+              <span class="block-icon">🥪</span>
+              <span class="block-label">Lunch</span>
+            </div>
+            <div class="draggable-block meal" draggable="true" data-type="dinner" data-category="meal">
+              <span class="block-icon">🍽️</span>
+              <span class="block-label">Dinner</span>
+            </div>
+            <div class="draggable-block meal" draggable="true" data-type="drinks" data-category="meal">
+              <span class="block-icon">🍺</span>
+              <span class="block-label">Drinks</span>
+            </div>
+            <div class="draggable-block meal" draggable="true" data-type="late_night" data-category="meal">
+              <span class="block-icon">🌙</span>
+              <span class="block-label">Late Night</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="block-category">
+          <div class="block-category-title">Golf</div>
+          <div class="block-grid">
+            <div class="draggable-block golf" draggable="true" data-type="tee_time" data-category="golf">
+              <span class="block-icon">⛳</span>
+              <span class="block-label">Tee Time</span>
+            </div>
+            <div class="draggable-block golf" draggable="true" data-type="practice_round" data-category="golf">
+              <span class="block-icon">🏌️</span>
+              <span class="block-label">Practice</span>
+            </div>
+            <div class="draggable-block golf" draggable="true" data-type="driving_range" data-category="golf">
+              <span class="block-icon">🎯</span>
+              <span class="block-label">Range</span>
+            </div>
+            <div class="draggable-block golf" draggable="true" data-type="putting_green" data-category="golf">
+              <span class="block-icon">🕳️</span>
+              <span class="block-label">Putting</span>
+            </div>
+            <div class="draggable-block golf" draggable="true" data-type="pro_shop" data-category="golf">
+              <span class="block-icon">🛍️</span>
+              <span class="block-label">Pro Shop</span>
+            </div>
+            <div class="draggable-block golf" draggable="true" data-type="lesson" data-category="golf">
+              <span class="block-icon">📋</span>
+              <span class="block-label">Lesson</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="block-category">
+          <div class="block-category-title">Transportation</div>
+          <div class="block-grid">
+            <div class="draggable-block transport" draggable="true" data-type="flight_arrival" data-category="transport">
+              <span class="block-icon">✈️</span>
+              <span class="block-label">Flight In</span>
+            </div>
+            <div class="draggable-block transport" draggable="true" data-type="flight_departure" data-category="transport">
+              <span class="block-icon">🛫</span>
+              <span class="block-label">Flight Out</span>
+            </div>
+            <div class="draggable-block transport" draggable="true" data-type="shuttle" data-category="transport">
+              <span class="block-icon">🚐</span>
+              <span class="block-label">Shuttle</span>
+            </div>
+            <div class="draggable-block transport" draggable="true" data-type="rental_pickup" data-category="transport">
+              <span class="block-icon">🔑</span>
+              <span class="block-label">Car Pickup</span>
+            </div>
+            <div class="draggable-block transport" draggable="true" data-type="rental_return" data-category="transport">
+              <span class="block-icon">🚗</span>
+              <span class="block-label">Car Return</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="block-category">
+          <div class="block-category-title">Lodging</div>
+          <div class="block-grid">
+            <div class="draggable-block lodging" draggable="true" data-type="check_in" data-category="lodging">
+              <span class="block-icon">🏨</span>
+              <span class="block-label">Check In</span>
+            </div>
+            <div class="draggable-block lodging" draggable="true" data-type="check_out" data-category="lodging">
+              <span class="block-icon">🧳</span>
+              <span class="block-label">Check Out</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="block-category">
+          <div class="block-category-title">Activities</div>
+          <div class="block-grid">
+            <div class="draggable-block activity" draggable="true" data-type="spa" data-category="activity">
+              <span class="block-icon">💆</span>
+              <span class="block-label">Spa</span>
+            </div>
+            <div class="draggable-block activity" draggable="true" data-type="pool" data-category="activity">
+              <span class="block-icon">🏊</span>
+              <span class="block-label">Pool</span>
+            </div>
+            <div class="draggable-block activity" draggable="true" data-type="cigars" data-category="activity">
+              <span class="block-icon">🚬</span>
+              <span class="block-label">Cigars</span>
+            </div>
+            <div class="draggable-block activity" draggable="true" data-type="poker" data-category="activity">
+              <span class="block-icon">🃏</span>
+              <span class="block-label">Poker</span>
+            </div>
+            <div class="draggable-block activity" draggable="true" data-type="casino" data-category="activity">
+              <span class="block-icon">🎰</span>
+              <span class="block-label">Casino</span>
+            </div>
+            <div class="draggable-block activity" draggable="true" data-type="fishing" data-category="activity">
+              <span class="block-icon">🎣</span>
+              <span class="block-label">Fishing</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="block-category">
+          <div class="block-category-title">Logistics</div>
+          <div class="block-grid">
+            <div class="draggable-block logistics" draggable="true" data-type="group_meeting" data-category="logistics">
+              <span class="block-icon">👥</span>
+              <span class="block-label">Meeting</span>
+            </div>
+            <div class="draggable-block logistics" draggable="true" data-type="bag_drop" data-category="logistics">
+              <span class="block-icon">🎒</span>
+              <span class="block-label">Bag Drop</span>
+            </div>
+            <div class="draggable-block logistics" draggable="true" data-type="free_time" data-category="logistics">
+              <span class="block-icon">⏸️</span>
+              <span class="block-label">Free Time</span>
+            </div>
+            <div class="draggable-block logistics" draggable="true" data-type="custom" data-category="logistics">
+              <span class="block-icon">✏️</span>
+              <span class="block-label">Custom</span>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+    <!-- Day Schedules -->
+    <div class="day-schedule">
+      <div class="day-header">
+        <h2 class="day-title">Monday, December 29</h2>
+        <span class="day-meta">Arrival Day • 4 events</span>
+      </div>
+      <div class="event-list" id="day-monday" data-day="2025-12-29">
+        
+        <div class="event-card" draggable="true">
+          <div class="event-drag-handle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="9" cy="6" r="2"></circle>
+              <circle cx="15" cy="6" r="2"></circle>
+              <circle cx="9" cy="12" r="2"></circle>
+              <circle cx="15" cy="12" r="2"></circle>
+              <circle cx="9" cy="18" r="2"></circle>
+              <circle cx="15" cy="18" r="2"></circle>
+            </svg>
+          </div>
+          <div class="event-color-bar meal"></div>
+          <div class="event-content">
+            <div class="event-time">
+              <div class="event-time-value">1:30</div>
+              <div class="event-time-period">PM</div>
+            </div>
+            <div class="event-details">
+              <div class="event-title-row">
+                <span class="event-icon">🍳</span>
+                <span class="event-title">Welcome Breakfast</span>
+                <span class="event-badge meal">meal</span>
+                <span class="event-badge soft">soft</span>
+              </div>
+              <div class="event-location">Carolina Dining Room</div>
+            </div>
+          </div>
+          <div class="event-actions">
+            <button class="event-action-btn edit" onclick="openEditModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="event-action-btn delete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="event-card" draggable="true">
+          <div class="event-drag-handle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="9" cy="6" r="2"></circle>
+              <circle cx="15" cy="6" r="2"></circle>
+              <circle cx="9" cy="12" r="2"></circle>
+              <circle cx="15" cy="12" r="2"></circle>
+              <circle cx="9" cy="18" r="2"></circle>
+              <circle cx="15" cy="18" r="2"></circle>
+            </svg>
+          </div>
+          <div class="event-color-bar golf"></div>
+          <div class="event-content">
+            <div class="event-time">
+              <div class="event-time-value">4:30</div>
+              <div class="event-time-period">PM</div>
+            </div>
+            <div class="event-details">
+              <div class="event-title-row">
+                <span class="event-icon">⛳</span>
+                <span class="event-title">Round 1: Pinehurst No. 2</span>
+                <span class="event-badge golf">tee time</span>
+                <span class="event-badge locked">locked</span>
+              </div>
+              <div class="event-location">Pinehurst No. 2</div>
+              <div class="event-confirmation">Confirmed: PH2-2024-1847</div>
+            </div>
+          </div>
+          <div class="event-actions">
+            <button class="event-action-btn edit" onclick="openEditModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="event-action-btn delete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="event-card" draggable="true">
+          <div class="event-drag-handle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="9" cy="6" r="2"></circle>
+              <circle cx="15" cy="6" r="2"></circle>
+              <circle cx="9" cy="12" r="2"></circle>
+              <circle cx="15" cy="12" r="2"></circle>
+              <circle cx="9" cy="18" r="2"></circle>
+              <circle cx="15" cy="18" r="2"></circle>
+            </svg>
+          </div>
+          <div class="event-color-bar meal"></div>
+          <div class="event-content">
+            <div class="event-time">
+              <div class="event-time-value">7:00</div>
+              <div class="event-time-period">PM</div>
+            </div>
+            <div class="event-details">
+              <div class="event-title-row">
+                <span class="event-icon">🍽️</span>
+                <span class="event-title">Dinner at The Deuce</span>
+                <span class="event-badge meal">meal</span>
+                <span class="event-badge soft">soft</span>
+              </div>
+              <div class="event-location">The Deuce at Pinehurst</div>
+              <div class="event-confirmation">Confirmed: DEUCE-8847</div>
+            </div>
+          </div>
+          <div class="event-actions">
+            <button class="event-action-btn edit" onclick="openEditModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="event-action-btn delete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="event-card" draggable="true">
+          <div class="event-drag-handle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="9" cy="6" r="2"></circle>
+              <circle cx="15" cy="6" r="2"></circle>
+              <circle cx="9" cy="12" r="2"></circle>
+              <circle cx="15" cy="12" r="2"></circle>
+              <circle cx="9" cy="18" r="2"></circle>
+              <circle cx="15" cy="18" r="2"></circle>
+            </svg>
+          </div>
+          <div class="event-color-bar activity"></div>
+          <div class="event-content">
+            <div class="event-time">
+              <div class="event-time-value">9:30</div>
+              <div class="event-time-period">PM</div>
+            </div>
+            <div class="event-details">
+              <div class="event-title-row">
+                <span class="event-icon">🚬</span>
+                <span class="event-title">Ryder Room Cigars & Cards</span>
+                <span class="event-badge activity">activity</span>
+                <span class="event-badge open">open</span>
+              </div>
+              <div class="event-location">Ryder Room, Manor Building</div>
+            </div>
+          </div>
+          <div class="event-actions">
+            <button class="event-action-btn edit" onclick="openEditModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="event-action-btn delete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="drop-zone" id="dropzone-monday">
+          <div class="drop-zone-icon">+</div>
+          <div>Drop event here</div>
+        </div>
+        
+      </div>
+    </div>
+    
+    <div class="day-schedule">
+      <div class="day-header">
+        <h2 class="day-title">Tuesday, December 30</h2>
+        <span class="day-meta">Golf Day • 0 events</span>
+      </div>
+      <div class="event-list" id="day-tuesday" data-day="2025-12-30">
+        <div class="drop-zone" id="dropzone-tuesday">
+          <div class="drop-zone-icon">+</div>
+          <div>Drop event here</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="day-schedule">
+      <div class="day-header">
+        <h2 class="day-title">Wednesday, December 31</h2>
+        <span class="day-meta">New Year's Eve • 0 events</span>
+      </div>
+      <div class="event-list" id="day-wednesday" data-day="2025-12-31">
+        <div class="drop-zone" id="dropzone-wednesday">
+          <div class="drop-zone-icon">+</div>
+          <div>Drop event here</div>
+        </div>
+      </div>
+    </div>
+    
+  </main>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-icon">⛳</span>
+        <span class="modal-title">Edit Tee Time</span>
+      </div>
+      <div class="modal-body">
+        
+        <div class="form-group">
+          <label class="form-label">Course / Location</label>
+          <select class="form-select">
+            <option>Pinehurst No. 2</option>
+            <option>Pinehurst No. 4</option>
+            <option>Pinehurst No. 8</option>
+          </select>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <input type="time" class="form-input" value="08:30">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration</label>
+            <select class="form-select">
+              <option>4 hours</option>
+              <option selected>5 hours</option>
+              <option>6 hours</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" rows="2" placeholder="Walking only, caddies assigned..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Confirmation #</label>
+          <input type="text" class="form-input" value="PH2-2024-1847" placeholder="Enter confirmation number">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <div class="status-options">
+            <div class="status-option" onclick="selectStatus(this)">
+              <div class="status-option-icon">🔓</div>
+              <div class="status-option-label">Open</div>
+            </div>
+            <div class="status-option" onclick="selectStatus(this)">
+              <div class="status-option-icon">🟡</div>
+              <div class="status-option-label">Soft</div>
+            </div>
+            <div class="status-option selected" onclick="selectStatus(this)">
+              <div class="status-option-icon">🔒</div>
+              <div class="status-option-label">Locked</div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="closeEditModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Pool toggle
+    function togglePool() {
+      const content = document.getElementById('poolContent');
+      const toggle = document.getElementById('poolToggle');
+      content.classList.toggle('collapsed');
+      toggle.textContent = content.classList.contains('collapsed') ? 'Expand' : 'Collapse';
+    }
+    
+    // Modal functions
+    function openEditModal() {
+      document.getElementById('editModal').classList.add('visible');
+    }
+    
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('visible');
+    }
+    
+    function selectStatus(el) {
+      document.querySelectorAll('.status-option').forEach(opt => opt.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+    
+    // Close modal on backdrop click
+    document.getElementById('editModal').addEventListener('click', function(e) {
+      if (e.target === this) closeEditModal();
+    });
+    
+    // Drag and Drop functionality
+    let draggedElement = null;
+    let draggedType = null;
+    let draggedCategory = null;
+    
+    // Make pool blocks draggable
+    document.querySelectorAll('.draggable-block').forEach(block => {
+      block.addEventListener('dragstart', function(e) {
+        draggedElement = this;
+        draggedType = this.dataset.type;
+        draggedCategory = this.dataset.category;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'copy';
+      });
+      
+      block.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        draggedElement = null;
+        draggedType = null;
+        draggedCategory = null;
+      });
+    });
+    
+    // Make existing event cards draggable for reordering
+    document.querySelectorAll('.event-card').forEach(card => {
+      card.addEventListener('dragstart', function(e) {
+        draggedElement = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      
+      card.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        draggedElement = null;
+      });
+    });
+    
+    // Drop zones
+    document.querySelectorAll('.event-list').forEach(list => {
+      list.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+        const dropZone = this.querySelector('.drop-zone');
+        if (dropZone) dropZone.classList.add('active');
+      });
+      
+      list.addEventListener('dragleave', function(e) {
+        if (!this.contains(e.relatedTarget)) {
+          this.classList.remove('drag-over');
+          const dropZone = this.querySelector('.drop-zone');
+          if (dropZone) dropZone.classList.remove('active');
+        }
+      });
+      
+      list.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        const dropZone = this.querySelector('.drop-zone');
+        if (dropZone) dropZone.classList.remove('active');
+        
+        // If dragging from pool, create new event
+        if (draggedType && draggedCategory) {
+          createNewEvent(this, draggedType, draggedCategory);
+        }
+        // If dragging existing event, move it
+        else if (draggedElement && draggedElement.classList.contains('event-card')) {
+          if (dropZone) {
+            this.insertBefore(draggedElement, dropZone);
+          }
+        }
+      });
+    });
+    
+    // Create new event from pool block
+    function createNewEvent(targetList, type, category) {
+      const blockData = {
+        breakfast: { icon: '🍳', label: 'Breakfast', time: '7:00 AM' },
+        brunch: { icon: '🥂', label: 'Brunch', time: '10:00 AM' },
+        lunch: { icon: '🥪', label: 'Lunch', time: '12:00 PM' },
+        dinner: { icon: '🍽️', label: 'Dinner', time: '7:00 PM' },
+        drinks: { icon: '🍺', label: 'Drinks', time: '9:00 PM' },
+        late_night: { icon: '🌙', label: 'Late Night', time: '11:00 PM' },
+        tee_time: { icon: '⛳', label: 'Tee Time', time: '8:00 AM' },
+        practice_round: { icon: '🏌️', label: 'Practice Round', time: '8:00 AM' },
+        driving_range: { icon: '🎯', label: 'Driving Range', time: '' },
+        putting_green: { icon: '🕳️', label: 'Putting Green', time: '' },
+        pro_shop: { icon: '🛍️', label: 'Pro Shop', time: '' },
+        lesson: { icon: '📋', label: 'Lesson', time: '' },
+        flight_arrival: { icon: '✈️', label: 'Flight Arrival', time: '' },
+        flight_departure: { icon: '🛫', label: 'Flight Departure', time: '' },
+        shuttle: { icon: '🚐', label: 'Shuttle', time: '' },
+        rental_pickup: { icon: '🔑', label: 'Car Pickup', time: '' },
+        rental_return: { icon: '🚗', label: 'Car Return', time: '' },
+        check_in: { icon: '🏨', label: 'Check In', time: '3:00 PM' },
+        check_out: { icon: '🧳', label: 'Check Out', time: '11:00 AM' },
+        spa: { icon: '💆', label: 'Spa', time: '' },
+        pool: { icon: '🏊', label: 'Pool', time: '' },
+        cigars: { icon: '🚬', label: 'Cigars', time: '9:00 PM' },
+        poker: { icon: '🃏', label: 'Poker Night', time: '9:00 PM' },
+        casino: { icon: '🎰', label: 'Casino', time: '9:00 PM' },
+        fishing: { icon: '🎣', label: 'Fishing', time: '6:00 AM' },
+        group_meeting: { icon: '👥', label: 'Group Meeting', time: '' },
+        bag_drop: { icon: '🎒', label: 'Bag Drop', time: '' },
+        free_time: { icon: '⏸️', label: 'Free Time', time: '' },
+        custom: { icon: '✏️', label: 'Custom Event', time: '' }
+      };
+      
+      const data = blockData[type];
+      const timeParts = data.time ? data.time.split(' ') : ['--:--', ''];
+      
+      const eventHTML = `
+        <div class="event-card" draggable="true">
+          <div class="event-drag-handle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="9" cy="6" r="2"></circle>
+              <circle cx="15" cy="6" r="2"></circle>
+              <circle cx="9" cy="12" r="2"></circle>
+              <circle cx="15" cy="12" r="2"></circle>
+              <circle cx="9" cy="18" r="2"></circle>
+              <circle cx="15" cy="18" r="2"></circle>
+            </svg>
+          </div>
+          <div class="event-color-bar ${category}"></div>
+          <div class="event-content">
+            <div class="event-time">
+              <div class="event-time-value">${timeParts[0] || '—'}</div>
+              <div class="event-time-period">${timeParts[1] || ''}</div>
+            </div>
+            <div class="event-details">
+              <div class="event-title-row">
+                <span class="event-icon">${data.icon}</span>
+                <span class="event-title">${data.label}</span>
+                <span class="event-badge ${category}">${category}</span>
+                <span class="event-badge open">open</span>
+              </div>
+              <div class="event-location">Click to set location</div>
+            </div>
+          </div>
+          <div class="event-actions">
+            <button class="event-action-btn edit" onclick="openEditModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button class="event-action-btn delete" onclick="this.closest('.event-card').remove()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+      
+      const dropZone = targetList.querySelector('.drop-zone');
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = eventHTML;
+      const newCard = tempDiv.firstElementChild;
+      
+      // Add drag listeners to new card
+      newCard.addEventListener('dragstart', function(e) {
+        draggedElement = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      
+      newCard.addEventListener('dragend', function() {
+        this.classList.remove('dragging');
+        draggedElement = null;
+      });
+      
+      if (dropZone) {
+        targetList.insertBefore(newCard, dropZone);
+      } else {
+        targetList.appendChild(newCard);
+      }
+      
+      // Open edit modal for new event
+      openEditModal();
+    }
+  </script>
+
+</body>
+</html>

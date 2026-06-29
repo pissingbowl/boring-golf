@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ledger — Full Page Reference</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1A2F23;
+      --background: #F5F3EF;
+      --surface: #FFFFFF;
+      --accent: #C9A227;
+      --accent-light: #D4B94A;
+      --secondary: #3D5A47;
+      --muted: #6B7280;
+      --border: rgba(26, 47, 35, 0.08);
+      
+      --positive: #22A55B;
+      --positive-bg: rgba(34, 165, 91, 0.08);
+      --negative: #DC2626;
+      --negative-bg: rgba(220, 38, 38, 0.06);
+      --settled: #6B7280;
+      --settled-bg: rgba(107, 114, 128, 0.06);
+      
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --shadow-sm: 0 1px 2px rgba(26, 47, 35, 0.04);
+      --shadow-md: 0 4px 12px rgba(26, 47, 35, 0.06);
+      --shadow-lg: 0 8px 24px rgba(26, 47, 35, 0.08);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: var(--font-sans);
+      background: var(--background);
+      color: var(--primary);
+      line-height: 1.5;
+    }
+    
+    /* ==========================================
+       PAGE LAYOUT
+       ========================================== */
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    
+    /* ==========================================
+       PAGE HEADER
+       ========================================== */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+    }
+    
+    .page-header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .page-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .page-icon svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+    
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    
+    .page-subtitle {
+      font-size: 0.9375rem;
+      color: var(--muted);
+    }
+    
+    .page-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+    }
+    
+    .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--background);
+      border-color: rgba(26, 47, 35, 0.15);
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #243D2E;
+    }
+    
+    /* ==========================================
+       SUMMARY HERO
+       ========================================== */
+    .summary-hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #223D2C 100%);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .summary-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 100 Q100 80 200 100 T400 100' fill='none' stroke='white' stroke-width='1' opacity='0.04'/%3E%3Cpath d='M0 60 Q100 40 200 60 T400 60' fill='none' stroke='white' stroke-width='1' opacity='0.03'/%3E%3Cpath d='M0 140 Q100 120 200 140 T400 140' fill='none' stroke='white' stroke-width='1' opacity='0.03'/%3E%3C/svg%3E");
+      background-size: cover;
+      pointer-events: none;
+    }
+    
+    .summary-content {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+    
+    .summary-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 8px;
+    }
+    
+    .summary-total {
+      font-family: var(--font-mono);
+      font-size: 3rem;
+      font-weight: 700;
+      color: white;
+      line-height: 1;
+    }
+    
+    .summary-meta {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 8px;
+    }
+    
+    .summary-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .summary-badge.warning {
+      background: rgba(220, 38, 38, 0.2);
+      color: #FCA5A5;
+    }
+    
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    
+    .summary-stat {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .summary-stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .summary-stat-value.default { color: white; }
+    .summary-stat-value.green { color: #4ADE80; }
+    .summary-stat-value.gold { color: var(--accent); }
+    .summary-stat-value.red { color: #FCA5A5; }
+    
+    .summary-stat-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* ==========================================
+       TABS
+       ========================================== */
+    .tabs-container {
+      margin-bottom: 24px;
+    }
+    
+    .tabs {
+      display: inline-flex;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    
+    .tab:hover {
+      color: var(--primary);
+    }
+    
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* ==========================================
+       CONTENT GRID
+       ========================================== */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+    
+    /* ==========================================
+       BALANCES CARD
+       ========================================== */
+    .card {
+      background: var(--surface);
+      border-radius: 14px;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .card-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .card-header-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--background);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    .card-subtitle {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    .card-badge {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    
+    .card-badge.green {
+      background: var(--positive-bg);
+      color: var(--positive);
+    }
+    
+    .card-badge.red {
+      background: var(--negative-bg);
+      color: var(--negative);
+    }
+    
+    /* Balance rows */
+    .balance-list {
+      padding: 8px 0;
+    }
+    
+    .balance-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 24px;
+      transition: background 0.1s ease;
+    }
+    
+    .balance-row:hover {
+      background: var(--background);
+    }
+    
+    .balance-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+    
+    .balance-row.positive .balance-avatar {
+      background: var(--positive-bg);
+      color: var(--positive);
+    }
+    
+    .balance-row.negative .balance-avatar {
+      background: var(--negative-bg);
+      color: var(--negative);
+    }
+    
+    .balance-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .balance-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    
+    .balance-detail {
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .balance-winnings {
+      color: var(--positive);
+      font-weight: 500;
+    }
+    
+    .balance-amount {
+      text-align: right;
+      margin-right: 16px;
+    }
+    
+    .balance-value {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    
+    .balance-value.positive { color: var(--positive); }
+    .balance-value.negative { color: var(--negative); }
+    .balance-value.settled { color: var(--settled); }
+    
+    .balance-status {
+      font-size: 0.6875rem;
+      color: var(--muted);
+    }
+    
+    .balance-action {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    
+    .balance-row:hover .balance-action {
+      opacity: 1;
+    }
+    
+    .balance-action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+    
+    .balance-action-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    .balance-action-btn svg {
+      width: 12px;
+      height: 12px;
+    }
+    
+    /* ==========================================
+       QUICK SETTLE CARD (Right sidebar)
+       ========================================== */
+    .settle-card {
+      background: var(--surface);
+      border-radius: 14px;
+      box-shadow: var(--shadow-md);
+    }
+    
+    .settle-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .settle-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    
+    .settle-subtitle {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    .settle-list {
+      padding: 12px;
+    }
+    
+    .settle-item {
+      background: var(--background);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+    
+    .settle-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .settle-item-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .settle-avatars {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+    }
+    
+    .settle-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--muted);
+      border: 2px solid var(--background);
+    }
+    
+    .settle-avatar:not(:first-child) {
+      margin-left: -10px;
+    }
+    
+    .settle-arrow {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin: 0 4px;
+    }
+    
+    .settle-item-info {
+      flex: 1;
+    }
+    
+    .settle-item-names {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .settle-item-reason {
+      font-size: 0.6875rem;
+      color: var(--muted);
+    }
+    
+    .settle-item-amount {
+      font-family: var(--font-mono);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--positive);
+    }
+    
+    .settle-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .settle-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: none;
+    }
+    
+    .settle-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+    
+    .settle-btn.venmo {
+      background: #008CFF;
+      color: white;
+    }
+    
+    .settle-btn.venmo:hover {
+      background: #0070CC;
+    }
+    
+    .settle-btn.mark-paid {
+      background: var(--surface);
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+    
+    .settle-btn.mark-paid:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    /* ==========================================
+       ACTIVITY TAB CONTENT
+       ========================================== */
+    .activity-list {
+      padding: 8px 0;
+    }
+    
+    .activity-row {
+      display: flex;
+      align-items: flex-start;
+      padding: 16px 24px;
+      transition: background 0.1s ease;
+      cursor: pointer;
+    }
+    
+    .activity-row:hover {
+      background: var(--background);
+    }
+    
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+    
+    .activity-icon.food { background: rgba(245, 158, 11, 0.1); }
+    .activity-icon.golf { background: rgba(34, 165, 91, 0.1); }
+    .activity-icon.lodging { background: rgba(59, 130, 246, 0.1); }
+    .activity-icon.transport { background: rgba(139, 92, 246, 0.1); }
+    .activity-icon.drinks { background: rgba(236, 72, 153, 0.1); }
+    
+    .activity-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .activity-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    
+    .activity-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    
+    .activity-meta strong {
+      color: var(--secondary);
+    }
+    
+    .activity-right {
+      text-align: right;
+      margin-left: 16px;
+    }
+    
+    .activity-amount {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 2px;
+    }
+    
+    .activity-split {
+      font-size: 0.6875rem;
+      color: var(--muted);
+    }
+    
+    .activity-receipt {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.625rem;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+    
+    .activity-receipt svg {
+      width: 10px;
+      height: 10px;
+    }
+    
+    /* ==========================================
+       ADD EXPENSE FAB
+       ========================================== */
+    .fab {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(26, 47, 35, 0.25);
+      transition: all 0.2s ease;
+      border: none;
+    }
+    
+    .fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(26, 47, 35, 0.3);
+    }
+    
+    .fab svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    /* ==========================================
+       RESPONSIVE
+       ========================================== */
+    @media (max-width: 900px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .summary-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .page-header {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .summary-top {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .summary-total {
+        font-size: 2.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+    
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+      <div class="page-header-left">
+        <div class="page-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="2" y1="7" x2="22" y2="7"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="page-title">Trip Ledger</h1>
+          <p class="page-subtitle">Pinehurst Invitational • Dec 27–30, 2024</p>
+        </div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export
+        </button>
+        <button class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Send Summary
+        </button>
+        <button class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Expense
+        </button>
+      </div>
+    </header>
+    
+    <!-- SUMMARY HERO -->
+    <div class="summary-hero">
+      <div class="summary-content">
+        <div class="summary-top">
+          <div>
+            <div class="summary-label">Total Trip Expenses</div>
+            <div class="summary-total">$4,847</div>
+            <div class="summary-meta">8 people • 23 transactions</div>
+          </div>
+          <div class="summary-badge warning">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            3 unsettled balances
+          </div>
+        </div>
+        
+        <div class="summary-stats">
+          <div class="summary-stat">
+            <div class="summary-stat-value default">$3,420</div>
+            <div class="summary-stat-label">Expenses</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-value gold">$540</div>
+            <div class="summary-stat-label">Game Winnings</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-value green">$387</div>
+            <div class="summary-stat-label">Settled</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-stat-value red">$153</div>
+            <div class="summary-stat-label">Outstanding</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- TABS -->
+    <div class="tabs-container">
+      <div class="tabs">
+        <button class="tab active">Balances</button>
+        <button class="tab">Activity</button>
+        <button class="tab">Payments</button>
+      </div>
+    </div>
+    
+    <!-- CONTENT GRID -->
+    <div class="content-grid">
+      
+      <!-- BALANCES CARD -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <div class="card-header-icon">👥</div>
+            <div>
+              <div class="card-title">Member Balances</div>
+              <div class="card-subtitle">Who owes what after expenses and winnings</div>
+            </div>
+          </div>
+          <span class="card-badge red">3 to settle</span>
+        </div>
+        
+        <div class="balance-list">
+          <!-- Positive balance (is owed) -->
+          <div class="balance-row positive">
+            <div class="balance-avatar">MC</div>
+            <div class="balance-info">
+              <div class="balance-name">Marcus Chen</div>
+              <div class="balance-detail">
+                Paid $847 for group
+                <span class="balance-winnings">Won $80</span>
+              </div>
+            </div>
+            <div class="balance-amount">
+              <div class="balance-value positive">+$142</div>
+              <div class="balance-status">is owed</div>
+            </div>
+            <div class="balance-action">
+              <button class="balance-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 11 12 14 22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                View Details
+              </button>
+            </div>
+          </div>
+          
+          <!-- Positive balance -->
+          <div class="balance-row positive">
+            <div class="balance-avatar">JM</div>
+            <div class="balance-info">
+              <div class="balance-name">Jake Morrison</div>
+              <div class="balance-detail">
+                Paid $2,400 lodging deposit
+              </div>
+            </div>
+            <div class="balance-amount">
+              <div class="balance-value positive">+$89</div>
+              <div class="balance-status">is owed</div>
+            </div>
+            <div class="balance-action">
+              <button class="balance-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 11 12 14 22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                View Details
+              </button>
+            </div>
+          </div>
+          
+          <!-- Settled -->
+          <div class="balance-row">
+            <div class="balance-avatar">DW</div>
+            <div class="balance-info">
+              <div class="balance-name">Devon Williams</div>
+              <div class="balance-detail">All settled up</div>
+            </div>
+            <div class="balance-amount">
+              <div class="balance-value settled">$0</div>
+              <div class="balance-status">settled</div>
+            </div>
+            <div class="balance-action">
+              <button class="balance-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 11 12 14 22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                View Details
+              </button>
+            </div>
+          </div>
+          
+          <!-- Negative balance (owes) -->
+          <div class="balance-row negative">
+            <div class="balance-avatar">RO</div>
+            <div class="balance-info">
+              <div class="balance-name">Ryan O'Connor</div>
+              <div class="balance-detail">Owes for dinner, golf cart</div>
+            </div>
+            <div class="balance-amount">
+              <div class="balance-value negative">-$67</div>
+              <div class="balance-status">owes</div>
+            </div>
+            <div class="balance-action">
+              <button class="balance-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M2 12h20"/>
+                </svg>
+                Request
+              </button>
+            </div>
+          </div>
+          
+          <!-- Negative balance -->
+          <div class="balance-row negative">
+            <div class="balance-avatar">TN</div>
+            <div class="balance-info">
+              <div class="balance-name">Tommy Nguyen</div>
+              <div class="balance-detail">Owes for lodging, range</div>
+            </div>
+            <div class="balance-amount">
+              <div class="balance-value negative">-$52</div>
+              <div class="balance-status">owes</div>
+            </div>
+            <div class="balance-action">
+              <button class="balance-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M2 12h20"/>
+                </svg>
+                Request
+              </button>
+            </div>
+          </div>
+          
+          <!-- Negative balance -->
+          <div class="balance-row negative">
+            <div class="balance-avatar">AH</div>
+            <div class="balance-info">
+              <div class="balance-name">Alex Hartman</div>
+              <div class="balance-detail">Owes for dinner, drinks</div>
+            </div>
+            <div class="balance-amount">
+              <div class="balance-value negative">-$34</div>
+              <div class="balance-status">owes</div>
+            </div>
+            <div class="balance-action">
+              <button class="balance-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v20M2 12h20"/>
+                </svg>
+                Request
+              </button>
+            </div>
+          </div>
+          
+          <!-- Settled -->
+          <div class="balance-row">
+            <div class="balance-avatar">CK</div>
+            <div class="balance-info">
+              <div class="balance-name">Chris Kim</div>
+              <div class="balance-detail">All settled up</div>
+            </div>
+            <div class="balance-amount">
+              <div class="balance-value settled">$0</div>
+              <div class="balance-status">settled</div>
+            </div>
+            <div class="balance-action">
+              <button class="balance-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 11 12 14 22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                View Details
+              </button>
+            </div>
+          </div>
+          
+          <!-- Settled -->
+          <div class="balance-row">
+            <div class="balance-avatar">BP</div>
+            <div class="balance-info">
+              <div class="balance-name">Brian Park</div>
+              <div class="balance-detail">All settled up</div>
+            </div>
+            <div class="balance-amount">
+              <div class="balance-value settled">$0</div>
+              <div class="balance-status">settled</div>
+            </div>
+            <div class="balance-action">
+              <button class="balance-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="9 11 12 14 22 4"/>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                </svg>
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- QUICK SETTLE SIDEBAR -->
+      <div>
+        <div class="settle-card">
+          <div class="settle-header">
+            <div class="settle-title">Quick Settle</div>
+            <div class="settle-subtitle">Suggested payments to balance the books</div>
+          </div>
+          
+          <div class="settle-list">
+            <!-- Settlement 1 -->
+            <div class="settle-item">
+              <div class="settle-item-header">
+                <div class="settle-avatars">
+                  <div class="settle-avatar">RO</div>
+                  <span class="settle-arrow">→</span>
+                  <div class="settle-avatar">MC</div>
+                </div>
+                <div class="settle-item-info">
+                  <div class="settle-item-names">Ryan → Marcus</div>
+                  <div class="settle-item-reason">For dinner, golf cart</div>
+                </div>
+                <div class="settle-item-amount">$67</div>
+              </div>
+              <div class="settle-item-actions">
+                <button class="settle-btn venmo">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.5 3c.9 1.5 1.3 3 1.3 5 0 5.5-4.7 12.7-8.5 17H5l-2-14.5L9.3 9l1 8c1.8-3 4-7.5 4-10.3 0-1.3-.2-2.2-.5-3l5.7-.7z"/>
+                  </svg>
+                  Venmo
+                </button>
+                <button class="settle-btn mark-paid">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Mark Paid
+                </button>
+              </div>
+            </div>
+            
+            <!-- Settlement 2 -->
+            <div class="settle-item">
+              <div class="settle-item-header">
+                <div class="settle-avatars">
+                  <div class="settle-avatar">TN</div>
+                  <span class="settle-arrow">→</span>
+                  <div class="settle-avatar">JM</div>
+                </div>
+                <div class="settle-item-info">
+                  <div class="settle-item-names">Tommy → Jake</div>
+                  <div class="settle-item-reason">For lodging deposit</div>
+                </div>
+                <div class="settle-item-amount">$52</div>
+              </div>
+              <div class="settle-item-actions">
+                <button class="settle-btn venmo">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.5 3c.9 1.5 1.3 3 1.3 5 0 5.5-4.7 12.7-8.5 17H5l-2-14.5L9.3 9l1 8c1.8-3 4-7.5 4-10.3 0-1.3-.2-2.2-.5-3l5.7-.7z"/>
+                  </svg>
+                  Venmo
+                </button>
+                <button class="settle-btn mark-paid">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Mark Paid
+                </button>
+              </div>
+            </div>
+            
+            <!-- Settlement 3 -->
+            <div class="settle-item">
+              <div class="settle-item-header">
+                <div class="settle-avatars">
+                  <div class="settle-avatar">AH</div>
+                  <span class="settle-arrow">→</span>
+                  <div class="settle-avatar">MC</div>
+                </div>
+                <div class="settle-item-info">
+                  <div class="settle-item-names">Alex → Marcus</div>
+                  <div class="settle-item-reason">For dinner, drinks</div>
+                </div>
+                <div class="settle-item-amount">$34</div>
+              </div>
+              <div class="settle-item-actions">
+                <button class="settle-btn venmo">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.5 3c.9 1.5 1.3 3 1.3 5 0 5.5-4.7 12.7-8.5 17H5l-2-14.5L9.3 9l1 8c1.8-3 4-7.5 4-10.3 0-1.3-.2-2.2-.5-3l5.7-.7z"/>
+                  </svg>
+                  Venmo
+                </button>
+                <button class="settle-btn mark-paid">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Mark Paid
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- FLOATING ACTION BUTTON -->
+    <button class="fab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+    </button>
+    
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+Design System:
+Colors:
+
+Background: Fairway #1A2F23 (dark green)
+Cards/surfaces: #FFFFFF with subtle shadow
+Leaderboard header: Rough #3D5A47
+Accent (skins, money, leaders): Brass #C9A227
+Positive scores (under par): #22A55B
+Negative scores (over par): #DC2626
+Neutral: #6B7280
+
+Typography:
+
+Page title: Cormorant Garamond, 24px, weight 500
+Section headers: Inter, 11px, weight 600, uppercase, letter-spacing 0.1em
+Player names: Inter, 15px, weight 500
+Scores/numbers: JetBrains Mono, 16px, weight 600
+Money amounts: JetBrains Mono, 14px, Brass color
+
+Leaderboard Row:
+tsx// Each row
+<div className="flex items-center py-3 border-b border-white/10">
+  <span className="w-8 text-brass font-mono">{position}</span>
+  <div className="w-10 h-10 rounded-full bg-rough flex items-center justify-center">
+    <span className="text-white font-sans text-sm font-medium">{initials}</span>
+  </div>
+  <span className="flex-1 ml-3 text-white font-sans">{name}</span>
+  <span className={`w-12 text-right font-mono ${scoreToPar < 0 ? 'text-positive' : scoreToPar > 0 ? 'text-negative' : 'text-white'}`}>
+    {scoreToPar === 0 ? 'E' : scoreToPar > 0 ? `+${scoreToPar}` : scoreToPar}
+  </span>
+  <span className="w-20 text-right font-mono text-brass">{skins} skins</span>
+</div>
+Scorecard Grid (when SCORECARD tab active):
+
+Horizontal scroll for holes
+Hole numbers across top
+Par row below hole numbers
+Each player gets a row
+Tap cell to enter/edit score
+Color coding: Eagle (gold bg), Birdie (green bg), Par (gray), Bogey (light red), Double+ (red)
+
+Skins View (when SKINS tab active):
+
+List of holes played
+Shows winner or "Carryover" for each
+Running pot display at bottom: "$40 carryover • 7 skins won • $100 pot left"
+
+Live Feed:
+
+Slides in from bottom right
+Cards with brass left border
+Auto-dismiss after 5 seconds
+Examples:
+
+"Marcus takes skin on #7 — $20"
+"Jake birdies #8"
+"Carryover on #9 — pot now $40"
+
+
+
+Data (hardcoded for now):
+typescriptconst PLAYERS = [
+  { id: 'mc', name: 'Marcus Chen', initials: 'MC' },
+  { id: 'jm', name: 'Jake Morrison', initials: 'JM' },
+  { id: 'dw', name: 'Devon Williams', initials: 'DW' },
+  { id: 'ro', name: 'Ryan O\'Connor', initials: 'RO' },
+  { id: 'tn', name: 'Tommy Nguyen', initials: 'TN' },
+  { id: 'ah', name: 'Alex Hartman', initials: 'AH' },
+];
+
+const HOLES = [
+  { number: 1, par: 4, yards: 405 },
+  { number: 2, par: 4, yards: 385 },
+  { number: 3, par: 3, yards: 185 },
+  { number: 4, par: 5, yards: 545 },
+  { number: 5, par: 4, yards: 430 },
+  { number: 6, par: 4, yards: 395 },
+  { number: 7, par: 4, yards: 438 },
+  { number: 8, par: 3, yards: 175 },
+  { number: 9, par: 5, yards: 520 },
+  { number: 10, par: 4, yards: 410 },
+  { number: 11, par: 4, yards: 425 },
+  { number: 12, par: 3, yards: 195 },
+  { number: 13, par: 5, yards: 530 },
+  { number: 14, par: 4, yards: 440 },
+  { number: 15, par: 4, yards: 400 },
+  { number: 16, par: 3, yards: 165 },
+  { number: 17, par: 4, yards: 455 },
+  { number: 18, par: 5, yards: 555 },
+];
+
+const SKIN_VALUE = 20; // $20 per skin
+Pre-populate some scores so it looks live:
+
+Marcus: 4,4,3,5,4,4,3,2,5 (through 9, -2)
+Jake: 4,4,3,5,4,4,4,3,4 (through 9, -1)
+Devon: 4,4,3,5,5,4,4,3,4 (through 9, E)
+Others: partial scores through hole 7-8
+
+Add route in App.tsx: <Route path="/charliescorecard" component={CharlieScorecard} />
+Keep all scoring logic functional — when you tap a cell, you can change the score and skins recalculate automatically.

@@ -1,7 +1,15 @@
+# Dependencies & build output (app/, store/, or legacy root leftovers)
 node_modules/
 dist/
 build/
+
+# Secrets — never commit
 .env
 .env.*
+!.env.example
+
+# OS & editor
 .DS_Store
 *.log
+.replit
+.vscode/
