@@ -1852,12 +1852,12 @@ __ds_ns.StatBlock = __ds_scope.StatBlock;
   );
 
   const PRODUCTS = [
-    { id:'scorecard', name:'Scorecard Holder', desc:'Full-grain leather, hand-stitched to ride in your back pocket all eighteen.', price:'$48', tag:'Best seller', tone:'accent' },
-    { id:'yardage', name:'Yardage Book Cover', desc:'Refillable cover that breaks in like an old glove. Fits standard books.', price:'$42' },
-    { id:'pouch', name:'Ball-Marker Pouch', desc:'Small bag for markers, tees, and the things you keep losing.', price:'$28' },
-    { id:'valuables', name:'Valuables Bag', desc:'Keys, wallet, phone. Drops in the cart and out of your mind.', price:'$96', tag:'New', tone:'green' },
-    { id:'headcover', name:'Driver Head Cover', desc:'Padded leather with a brass snap. Quietly the best-dressed club in the bag.', price:'$58' },
-    { id:'patch', name:'Hat Patch · Set of 2', desc:'Laser-engraved leather patches. Stick one on the lid, save one for later.', price:'$18' },
+    { id:'scorecard', name:'Scorecard Holder', desc:'Full-grain leather, hand-stitched to ride in your back pocket all eighteen.', price:'$48', tag:'Best seller', tone:'accent', image:'/images/scorecard.png' },
+    { id:'yardage', name:'Yardage Book Cover', desc:'Refillable cover that breaks in like an old glove. Fits standard books.', price:'$42', image:'/images/yardage.png' },
+    { id:'pouch', name:'Ball-Marker Pouch', desc:'Small bag for markers, tees, and the things you keep losing.', price:'$28', image:'/images/pouch.png' },
+    { id:'valuables', name:'Valuables Bag', desc:'Keys, wallet, phone. Drops in the cart and out of your mind.', price:'$96', tag:'New', tone:'green', image:'/images/valuables.png' },
+    { id:'headcover', name:'Driver Head Cover', desc:'Padded leather with a brass snap. Quietly the best-dressed club in the bag.', price:'$58', image:'/images/headcover.png' },
+    { id:'patch', name:'Hat Patch · Set of 2', desc:'Laser-engraved leather patches. Stick one on the lid, save one for later.', price:'$18', image:'/images/patch.png' },
   ];
 
   const CRAFT = [
@@ -1892,7 +1892,7 @@ __ds_ns.StatBlock = __ds_scope.StatBlock;
   function Hero() {
     return (
       <header className="hero" id="top">
-        <image-slot id="hero-photo" fit="cover" placeholder="Drop a forest / course hero photo"></image-slot>
+        <image-slot id="hero-photo" fit="cover" src="/images/hero.png" placeholder="Drop a forest / course hero photo"></image-slot>
         <img className="hero-seal" src={SEAL} alt="Boring Golf heritage badge" />
         <div className="hero-inner">
           <div className="wrap">
@@ -1932,7 +1932,7 @@ __ds_ns.StatBlock = __ds_scope.StatBlock;
         <div className="grid">
           {PRODUCTS.map(p => (
             <article className="prod" key={p.id}>
-              <image-slot id={'prod-' + p.id} fit="cover" placeholder={'Photo · ' + p.name}></image-slot>
+              <image-slot id={'prod-' + p.id} fit="cover" src={p.image} placeholder={'Photo · ' + p.name}></image-slot>
               <div className="prod-head">
                 <h3>{p.name}</h3>
                 <span className="prod-price">{p.price}</span>
@@ -1970,7 +1970,7 @@ __ds_ns.StatBlock = __ds_scope.StatBlock;
               ))}
             </ul>
           </div>
-          <image-slot id="craft-photo" fit="cover" placeholder="Drop a workshop / leather detail photo"></image-slot>
+          <image-slot id="craft-photo" fit="cover" src="/images/craft.png" placeholder="Drop a workshop / leather detail photo"></image-slot>
         </div>
       </section>
     );
@@ -1979,7 +1979,7 @@ __ds_ns.StatBlock = __ds_scope.StatBlock;
   function Band() {
     return (
       <section className="band" id="story">
-        <image-slot id="band-photo" fit="cover" placeholder="Drop a wide forest / course photo"></image-slot>
+        <image-slot id="band-photo" fit="cover" src="/images/band.png" placeholder="Drop a wide forest / course photo"></image-slot>
         <div className="band-inner">
           <p className="eyebrow">Play more. Care less.</p>
           <h2>See you in the woods.</h2>
